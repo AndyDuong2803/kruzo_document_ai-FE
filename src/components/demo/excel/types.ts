@@ -1,4 +1,4 @@
-import type { OcrPreview, WorkbookSheet } from "@/lib/ocr/normalizeOcrResult";
+import type { OcrPreview, WorkbookSheet } from "@/features/ocr/preview";
 
 export type TourTarget = "upload" | "fileList" | "submit" | "settings" | "history" | "modalPreview";
 

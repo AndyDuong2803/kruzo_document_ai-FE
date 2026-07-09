@@ -14,11 +14,11 @@ import ThemeToggle from './ThemeToggle';
 
 const appNavItems = [
     {
-        text: "Excel Demo",
+        text: "Extract Document",
         url: "/try"
     },
     {
-        text: "API Playground",
+        text: "API Integration",
         url: "/try/api"
     },
     {
@@ -32,6 +32,10 @@ const appNavItems = [
     {
         text: "Docs",
         url: "/docs"
+    },
+    {
+        text: "Login",
+        url: "/login"
     }
 ];
 
@@ -47,10 +51,11 @@ const trackedSectionIds = menuItems
 
 const Header: React.FC = () => {
     const pathname = usePathname();
+    const currentPath = pathname ?? '/';
     const [isOpen, setIsOpen] = useState(false);
     const [hasScrolled, setHasScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('');
-    const isMarketingHeader = pathname === '/';
+    const isMarketingHeader = currentPath === '/';
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -68,10 +73,10 @@ const Header: React.FC = () => {
 
     const isAppNavActive = (url: string) => {
         if (url === '/try') {
-            return pathname === '/try';
+            return currentPath === '/try';
         }
 
-        return pathname === url || pathname.startsWith(`${url}/`);
+        return currentPath === url || currentPath.startsWith(`${url}/`);
     };
 
     useEffect(() => {
@@ -123,7 +128,7 @@ const Header: React.FC = () => {
             window.removeEventListener('scroll', updateHeader);
             window.removeEventListener('hashchange', updateHeader);
         };
-    }, [isMarketingHeader, pathname]);
+    }, [currentPath, isMarketingHeader]);
 
     return (
         <header
@@ -162,6 +167,9 @@ const Header: React.FC = () => {
                                 ))}
                             </ul>
                             <ThemeToggle />
+                            <Link href="/login" className="brand-button brand-button-secondary button-pop px-5 py-2.5">
+                                Login
+                            </Link>
                             <Link href="/try" className="brand-button brand-button-primary button-pop px-6 py-2.5">
                                 Try Demo
                             </Link>
@@ -236,6 +244,11 @@ const Header: React.FC = () => {
                                         </Link>
                                     </li>
                                 ))}
+                                <li>
+                                    <Link href="/login" className="brand-button brand-button-secondary button-pop w-fit px-5 py-2" onClick={() => setIsOpen(false)}>
+                                        Login
+                                    </Link>
+                                </li>
                                 <li>
                                     <Link href="/try" className="brand-button brand-button-primary button-pop w-fit px-5 py-2" onClick={() => setIsOpen(false)}>
                                         Try Demo

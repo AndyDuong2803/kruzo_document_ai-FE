@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 
-import type { WorkbookSheet } from "./types";
+import type { WorkbookSheet } from "@/features/ocr/preview";
 
 type ExcelSheetViewerProps = {
   sheets: WorkbookSheet[];

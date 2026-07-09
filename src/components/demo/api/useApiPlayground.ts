@@ -1,66 +1,45 @@
 import { ChangeEvent, useMemo, useState } from "react";
 
 import {
-  buildDisplayApiUrl,
-  hasConfiguredApiBaseUrl,
-  OCR_CUSTOM_PATH,
-  OCR_STANDARD_PATH,
-} from "@/lib/api/config";
-import { ApiError } from "@/lib/api/errors";
-import { extractCustomOcr, extractOcr } from "@/lib/api/ocr";
-import { sampleOcrResponse } from "@/lib/ocr/normalizeOcrResult";
+  displayOcrEndpoint,
+  hasConfiguredOcrApi,
+  OCR_EXTRACT_PATH,
+  ApiError,
+  extractCustomOcr,
+} from "@/features/ocr/api";
+import { sampleOcrResponse } from "@/features/ocr/preview";
 import { defaultSchemaSample } from "./constants";
+import { createFailurePayload, stringifyJson } from "./failurePayload";
 import { formatJson, validateJson } from "./formatJson";
+import {
+  buildCurlCommand,
+  buildFetchExample,
+  buildPythonExample,
+  buildRequestSummary,
+} from "./snippets";
+import { useApiHistory } from "./useApiHistory";
+import { useClipboardCopy } from "./useClipboardCopy";
 import type { ApiHistoryItem, ExtractMode, PlaygroundTab, SendState } from "./types";
-
-const HISTORY_PAGE_SIZE = 10;
-
-const timeLabel = () =>
-  new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-
-const stringifyJson = (value: unknown) => JSON.stringify(value, null, 2);
-
-const createFailurePayload = (error: unknown) => {
-  if (error instanceof ApiError) {
-    return {
-      success: false,
-      status: error.status ?? null,
-      error_code: error.errorCode ?? null,
-      message: error.friendlyMessage,
-      details: error.details ?? null,
-    };
-  }
-
-  return {
-    success: false,
-    message: "Something went wrong while processing the document.",
-    details: error instanceof Error ? { message: error.message } : error,
-  };
-};
 
 export const useApiPlayground = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [mode, setMode] = useState<ExtractMode>("standard");
   const [schemaSample, setSchemaSample] = useState(defaultSchemaSample);
   const [sendState, setSendState] = useState<SendState>("idle");
   const [message, setMessage] = useState("Sample response is shown until you send a real request.");
   const [responsePreview, setResponsePreview] = useState<unknown | null>(null);
   const [debugDetails, setDebugDetails] = useState("");
-  const [copiedLabel, setCopiedLabel] = useState("");
   const [activeTab, setActiveTab] = useState<PlaygroundTab>("request");
-  const [history, setHistory] = useState<ApiHistoryItem[]>([]);
-  const [historyPage, setHistoryPage] = useState(0);
-  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
+  const apiHistory = useApiHistory();
+  const { copiedLabel, copyText } = useClipboardCopy(() => {
+    setMessage("Copy failed in this browser. You can still select the text manually.");
+  });
+  const mode: ExtractMode = "custom";
 
-  const endpointPath = mode === "custom" ? OCR_CUSTOM_PATH : OCR_STANDARD_PATH;
-  const endpoint = buildDisplayApiUrl(endpointPath);
+  const endpointPath = OCR_EXTRACT_PATH;
+  const endpoint = displayOcrEndpoint(endpointPath);
   const filePart = file?.name || "repair-order.pdf";
   const schemaValidation = useMemo(() => validateJson(schemaSample), [schemaSample]);
-  const schemaIsValidForMode = mode !== "custom" || schemaValidation.valid;
+  const schemaIsValidForMode = schemaValidation.valid;
   const schemaSampleForExamples = schemaSample.trim() || defaultSchemaSample;
   const compactSchemaSample = schemaSampleForExamples.replace(/\s+/g, " ");
 
@@ -94,69 +73,14 @@ export const useApiPlayground = () => {
     return stringifyJson(sampleResponse);
   }, [loadingResponse, responsePreview, sampleResponse, sendState]);
 
-  const requestSummary = useMemo(() => {
-    const customLine = mode === "custom" ? "\n  schema_sample: JSON schema string" : "";
-
-    return `Method: POST
-URL: ${endpoint}
-Content-Type: multipart/form-data
-Authentication: Not required for current OCR endpoints
-
-Fields:
-  file: ${filePart}${customLine}`;
-  }, [endpoint, filePart, mode]);
-
-  const curlCommand = useMemo(() => {
-    const customPart =
-      mode === "custom" ? ` \\\n  -F 'schema_sample=${compactSchemaSample}'` : "";
-
-    return `curl -X POST "${endpoint}" \\
-  -F "file=@${filePart}"${customPart}`;
-  }, [compactSchemaSample, endpoint, filePart, mode]);
-
-  const fetchExample = useMemo(() => {
-    const customPart =
-      mode === "custom"
-        ? `\nformData.append("schema_sample", ${JSON.stringify(schemaSampleForExamples)});`
-        : "";
-
-    return `const formData = new FormData();
-formData.append("file", fileInput.files[0]);${customPart}
-
-const response = await fetch("${endpoint}", {
-  method: "POST",
-  body: formData,
-});
-
-const result = await response.json();`;
-  }, [endpoint, mode, schemaSampleForExamples]);
-
-  const pythonExample = useMemo(() => {
-    if (mode === "custom") {
-      return `import requests
-
-schema_sample = """${schemaSampleForExamples}"""
-
-with open("repair-order.pdf", "rb") as file:
-    response = requests.post(
-        "${endpoint}",
-        files={"file": file},
-        data={"schema_sample": schema_sample},
-    )
-
-result = response.json()`;
-    }
-
-    return `import requests
-
-with open("repair-order.pdf", "rb") as file:
-    response = requests.post(
-        "${endpoint}",
-        files={"file": file},
-    )
-
-result = response.json()`;
-  }, [endpoint, mode, schemaSampleForExamples]);
+  const snippetOptions = useMemo(
+    () => ({ compactSchemaSample, endpoint, filePart, schemaSampleForExamples }),
+    [compactSchemaSample, endpoint, filePart, schemaSampleForExamples]
+  );
+  const requestSummary = useMemo(() => buildRequestSummary(snippetOptions), [snippetOptions]);
+  const curlCommand = useMemo(() => buildCurlCommand(snippetOptions), [snippetOptions]);
+  const fetchExample = useMemo(() => buildFetchExample(snippetOptions), [snippetOptions]);
+  const pythonExample = useMemo(() => buildPythonExample(snippetOptions), [snippetOptions]);
 
   const activeContent = {
     request: requestSummary,
@@ -166,8 +90,8 @@ result = response.json()`;
     response: responseContent,
   }[activeTab];
 
-  const sendDisabledReason = !hasConfiguredApiBaseUrl
-    ? "NEXT_PUBLIC_API_BASE_URL is not configured locally."
+  const sendDisabledReason = !hasConfiguredOcrApi
+    ? "OCR API endpoint is not configured."
     : !file
       ? "Choose a file before sending."
       : !schemaIsValidForMode
@@ -175,30 +99,6 @@ result = response.json()`;
         : "";
 
   const canSend = sendState !== "loading" && !sendDisabledReason;
-
-  const activeHistoryItem = useMemo(
-    () => history.find((item) => item.id === activeHistoryId) ?? null,
-    [activeHistoryId, history]
-  );
-
-  const historyTotalPages = Math.max(1, Math.ceil(history.length / HISTORY_PAGE_SIZE));
-  const boundedHistoryPage = Math.min(historyPage, historyTotalPages - 1);
-  const historyPageItems = history.slice(
-    boundedHistoryPage * HISTORY_PAGE_SIZE,
-    boundedHistoryPage * HISTORY_PAGE_SIZE + HISTORY_PAGE_SIZE
-  );
-
-  const pushHistory = (item: Omit<ApiHistoryItem, "id" | "timeLabel">) => {
-    setHistory((current) => [
-      {
-        ...item,
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        timeLabel: timeLabel(),
-      },
-      ...current,
-    ]);
-    setHistoryPage(0);
-  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] ?? null;
@@ -211,25 +111,10 @@ result = response.json()`;
   };
 
   const handleModeChange = (nextMode: ExtractMode) => {
-    setMode(nextMode);
     setSendState("idle");
     setResponsePreview(null);
     setDebugDetails("");
-    setMessage(
-      nextMode === "custom"
-        ? "Custom template mode sends the file plus schema_sample."
-        : "Standard mode sends only the document file."
-    );
-  };
-
-  const copyText = async (value: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedLabel(label);
-      window.setTimeout(() => setCopiedLabel(""), 1400);
-    } catch {
-      setMessage("Copy failed in this browser. You can still select the text manually.");
-    }
+    setMessage(`${nextMode === "custom" ? "Template" : "Selected"} mode sends the file plus schema_sample.`);
   };
 
   const copyActiveTab = () => copyText(activeContent, activeTab);
@@ -275,14 +160,13 @@ result = response.json()`;
     setMessage("Sending request to the OCR API...");
 
     try {
-      const result =
-        mode === "custom" ? await extractCustomOcr(file as File, schemaSample) : await extractOcr(file as File);
+      const result = await extractCustomOcr(file as File, schemaSample);
       const responseJson = stringifyJson(result);
 
       setResponsePreview(result);
       setSendState("success");
       setMessage("Real API response loaded.");
-      pushHistory({
+      apiHistory.pushHistory({
         endpointPath,
         filename: (file as File).name,
         mode,
@@ -303,7 +187,7 @@ result = response.json()`;
       setSendState("error");
       setMessage(friendlyMessage);
       setDebugDetails(responseJson);
-      pushHistory({
+      apiHistory.pushHistory({
         endpointPath,
         filename: (file as File).name,
         mode,
@@ -317,9 +201,9 @@ result = response.json()`;
 
   return {
     activeContent,
-    activeHistoryItem,
+    activeHistoryItem: apiHistory.activeHistoryItem,
     activeTab,
-    boundedHistoryPage,
+    boundedHistoryPage: apiHistory.boundedHistoryPage,
     canSend,
     copiedLabel,
     debugDetails,
@@ -328,9 +212,9 @@ result = response.json()`;
     file,
     handleFileChange,
     handleModeChange,
-    history,
-    historyPageItems,
-    historyTotalPages,
+    history: apiHistory.history,
+    historyPageItems: apiHistory.historyPageItems,
+    historyTotalPages: apiHistory.historyTotalPages,
     message,
     mode,
     schemaSample,
@@ -338,9 +222,9 @@ result = response.json()`;
     sendDisabledReason,
     sendRequest,
     sendState,
-    setActiveHistoryId,
+    setActiveHistoryId: apiHistory.setActiveHistoryId,
     setActiveTab,
-    setHistoryPage,
+    setHistoryPage: apiHistory.setHistoryPage,
     setSchemaSample,
     copyActiveTab,
     copyHistoryResponse,

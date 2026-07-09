@@ -18,9 +18,9 @@ const ApiPlayground: React.FC = () => {
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Developer tool</p>
-            <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">API Playground</h1>
+            <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">API Integration</h1>
             <p className="mt-3 text-muted">
-              Test the current FastAPI OCR endpoints with a real multipart request.
+              Test template-based OCR extraction with a real multipart request.
             </p>
           </div>
 

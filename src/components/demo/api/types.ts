@@ -1,6 +1,6 @@
 export type SendState = "idle" | "loading" | "success" | "error";
 export type PlaygroundTab = "request" | "curl" | "javascript" | "python" | "response";
-export type ExtractMode = "standard" | "custom";
+export type ExtractMode = "custom";
 
 export type PlaygroundTabOption = {
   id: PlaygroundTab;

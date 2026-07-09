@@ -52,28 +52,35 @@ const ApiRequestForm: React.FC<ApiRequestFormProps> = ({
     <div className="brand-card min-w-0 rounded-2xl p-5 md:p-6">
 
       <div className="grid gap-4">
-        <div className="grid gap-3">
-          <FieldLabel>Extraction mode</FieldLabel>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {modeOptions.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                aria-pressed={mode === option.id}
-                className={clsx(
-                  "rounded-2xl border p-4 text-left transition-colors",
-                  mode === option.id
-                    ? "border-[var(--accent-border)] bg-[var(--accent-soft)] text-secondary"
-                    : "border-border bg-card-muted text-foreground hover:border-[var(--accent-border)]"
-                )}
-                onClick={() => onModeChange(option.id)}
-              >
-                <span className="block text-sm font-bold">{option.label}</span>
-                <span className="mt-1 block text-sm text-muted">{option.description}</span>
-              </button>
-            ))}
+        {modeOptions.length > 1 ? (
+          <div className="grid gap-3">
+            <FieldLabel>Extraction mode</FieldLabel>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {modeOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={mode === option.id}
+                  className={clsx(
+                    "rounded-2xl border p-4 text-left transition-colors",
+                    mode === option.id
+                      ? "border-[var(--accent-border)] bg-[var(--accent-soft)] text-secondary"
+                      : "border-border bg-card-muted text-foreground hover:border-[var(--accent-border)]"
+                  )}
+                  onClick={() => onModeChange(option.id)}
+                >
+                  <span className="block text-sm font-bold">{option.label}</span>
+                  <span className="mt-1 block text-sm text-muted">{option.description}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--accent-border)] bg-[var(--accent-soft)] p-4">
+            <p className="text-sm font-bold text-secondary">Template extraction</p>
+            <p className="mt-1 text-sm text-muted">Requests must include a document file and schema_sample.</p>
+          </div>
+        )}
 
         <div className="grid gap-2">
           <FieldLabel>Upload file</FieldLabel>
@@ -86,15 +93,13 @@ const ApiRequestForm: React.FC<ApiRequestFormProps> = ({
           <p className="text-sm text-muted">{file?.name || "PDF, JPG, PNG, or WEBP"}</p>
         </div>
 
-        {mode === "custom" && (
-          <JsonSchemaEditor
-            value={schemaSample}
-            validation={schemaValidation}
-            onChange={onSchemaSampleChange}
-            onFormat={onFormatSchema}
-            onUseSample={onUseSampleSchema}
-          />
-        )}
+        <JsonSchemaEditor
+          value={schemaSample}
+          validation={schemaValidation}
+          onChange={onSchemaSampleChange}
+          onFormat={onFormatSchema}
+          onUseSample={onUseSampleSchema}
+        />
 
         <details className="rounded-2xl border border-border bg-card-muted p-4">
           <summary className="cursor-pointer text-sm font-semibold text-foreground">

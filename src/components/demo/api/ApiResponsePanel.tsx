@@ -40,13 +40,13 @@ const ApiResponsePanel: React.FC<ApiResponsePanelProps> = ({
       label: "Loading",
       helper: "Waiting for the OCR API response.",
       icon: FiClock,
-      className: "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200",
+      className: "border-amber-600 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500 dark:text-amber-950",
     },
     success: {
       label: "Real response",
       helper: "Response returned by the OCR API.",
       icon: FiCheckCircle,
-      className: "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200",
+      className: "border-emerald-700 bg-emerald-100 text-emerald-950 dark:border-emerald-300 dark:bg-emerald-500 dark:text-emerald-950",
     },
     error: {
       label: "Failed",

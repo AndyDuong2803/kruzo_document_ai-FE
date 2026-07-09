@@ -20,14 +20,25 @@ const ExcelDemoWorkspace: React.FC = () => {
   const {
     selectedFiles,
     processingHistory,
-    documentType,
-    excelTemplate,
+    customFields,
+    customTableColumns,
+    customTableEnabled,
+    customTableName,
+    selectedTemplateId,
+    templateReady,
     processingLabel,
     submitLabel,
     activeResultFile,
     toasts,
-    setDocumentType,
-    setExcelTemplate,
+    setCustomTableEnabled,
+    setCustomTableName,
+    setSelectedTemplateId,
+    addCustomField,
+    addCustomTableColumn,
+    removeCustomField,
+    removeCustomTableColumn,
+    updateCustomField,
+    updateCustomTableColumn,
     addCollectedFiles,
     showFolderUnsupportedToast,
     removeFile,
@@ -63,10 +74,10 @@ const ExcelDemoWorkspace: React.FC = () => {
         <div className="mx-auto max-w-7xl">
           <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Excel Demo</p>
-              <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">Document to Excel Demo</h1>
+              <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Extract Document</p>
+              <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">Template-based document extraction</h1>
               <p className="mt-3 max-w-2xl text-muted">
-                Add files, click Submit, then view results from history.
+                Choose a template, add files, then extract only the requested fields.
               </p>
             </div>
 
@@ -80,7 +91,7 @@ const ExcelDemoWorkspace: React.FC = () => {
                 Guide me
               </button>
               <Link href="/try/api" className="nav-link text-sm font-semibold">
-                Developer? Open API Playground
+                Developer? Open API Integration
               </Link>
             </div>
           </div>
@@ -102,6 +113,7 @@ const ExcelDemoWorkspace: React.FC = () => {
               />
 
               <SubmitPanel
+                canSubmit={selectedFiles.length > 0 && templateReady}
                 selectedCount={selectedFiles.length}
                 submitLabel={submitLabel}
                 processingLabel={processingLabel}
@@ -110,11 +122,21 @@ const ExcelDemoWorkspace: React.FC = () => {
               />
 
               <ExtractionSettings
-                documentType={documentType}
-                excelTemplate={excelTemplate}
+                customFields={customFields}
+                customTableColumns={customTableColumns}
+                customTableEnabled={customTableEnabled}
+                customTableName={customTableName}
                 highlighted={isTargetActive("settings")}
-                onDocumentTypeChange={setDocumentType}
-                onExcelTemplateChange={setExcelTemplate}
+                selectedTemplateId={selectedTemplateId}
+                onAddCustomField={addCustomField}
+                onAddCustomTableColumn={addCustomTableColumn}
+                onCustomTableEnabledChange={setCustomTableEnabled}
+                onCustomTableNameChange={setCustomTableName}
+                onRemoveCustomField={removeCustomField}
+                onRemoveCustomTableColumn={removeCustomTableColumn}
+                onTemplateChange={setSelectedTemplateId}
+                onUpdateCustomField={updateCustomField}
+                onUpdateCustomTableColumn={updateCustomTableColumn}
               />
             </div>
 

@@ -16,11 +16,19 @@ const Reveal: React.FC<RevealProps> = ({
     threshold = 0.18,
 }) => {
     const ref = useRef<HTMLDivElement>(null);
+    const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
+
         const node = ref.current;
         if (!node) {
+            return;
+        }
+
+        if (!("IntersectionObserver" in window)) {
+            setIsVisible(true);
             return;
         }
 
@@ -51,7 +59,7 @@ const Reveal: React.FC<RevealProps> = ({
     return (
         <div
             ref={ref}
-            className={`reveal ${isVisible ? "is-visible" : ""} ${className}`}
+            className={`reveal ${isMounted && !isVisible ? "is-pending" : ""} ${isVisible ? "is-visible" : ""} ${className}`}
             style={{ "--reveal-delay": `${delay}ms` } as React.CSSProperties}
         >
             {children}

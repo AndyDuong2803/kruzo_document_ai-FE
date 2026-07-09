@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { HiArrowRight } from "react-icons/hi2";
 
 type SubmitPanelProps = {
+  canSubmit: boolean;
   selectedCount: number;
   processingLabel: string;
   submitLabel: string;
@@ -11,6 +12,7 @@ type SubmitPanelProps = {
 };
 
 const SubmitPanel: React.FC<SubmitPanelProps> = ({
+  canSubmit,
   selectedCount,
   processingLabel,
   submitLabel,
@@ -19,7 +21,9 @@ const SubmitPanel: React.FC<SubmitPanelProps> = ({
   onSubmit,
 }) => {
   const helperMessage = selectedCount > 0
-      ? "Review the selected documents, then click Submit."
+      ? canSubmit
+        ? "Review the selected documents, then click Submit."
+        : "Choose a template or add custom fields before submitting."
       : processingLabel || "Add documents to enable Submit.";
 
   return (
@@ -39,7 +43,7 @@ const SubmitPanel: React.FC<SubmitPanelProps> = ({
         type="button"
         className="brand-button brand-button-primary button-pop w-full gap-2 px-5 py-3"
         onClick={onSubmit}
-        disabled={selectedCount === 0}
+        disabled={!canSubmit}
       >
         {submitLabel}
         <HiArrowRight aria-hidden="true" />

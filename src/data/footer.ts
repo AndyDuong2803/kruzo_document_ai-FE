@@ -14,11 +14,11 @@ export const footerDetails: {
     conversionLine: "Ready to test your document workflow?",
     quickLinks: [
         {
-            text: "Excel Demo",
+            text: "Extract Document",
             url: "/try"
         },
         {
-            text: "API Playground",
+            text: "API Integration",
             url: "/try/api"
         },
         {
@@ -32,6 +32,10 @@ export const footerDetails: {
         {
             text: "Docs",
             url: "/docs"
+        },
+        {
+            text: "Login",
+            url: "/login"
         }
     ],
     ctaLinks: [
@@ -40,7 +44,7 @@ export const footerDetails: {
             url: "/#audit"
         },
         {
-            text: "Try Excel Demo",
+            text: "Extract Document",
             url: "/try"
         },
         {

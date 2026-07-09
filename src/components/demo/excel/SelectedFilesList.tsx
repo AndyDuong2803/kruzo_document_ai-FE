@@ -67,10 +67,10 @@ const SelectedFilesList: React.FC<SelectedFilesListProps> = ({
                       <span
                         className={clsx(
                           "rounded-full border px-2 py-0.5 font-semibold",
-                          item.status === "done" && "border-[var(--accent-border)] bg-[var(--accent-soft)] text-secondary",
-                          item.status === "failed" && "border-border bg-card text-muted",
-                          item.status === "processing" && "border-[var(--accent-border)] bg-card text-secondary",
-                          item.status === "ready" && "border-border bg-card text-muted"
+                          item.status === "done" && "border-emerald-700 bg-emerald-100 text-emerald-950 dark:border-emerald-300 dark:bg-emerald-500 dark:text-emerald-950",
+                          item.status === "failed" && "border-red-700 bg-red-600 text-white dark:border-red-400 dark:bg-red-500 dark:text-white",
+                          item.status === "processing" && "border-amber-600 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500 dark:text-amber-950",
+                          item.status === "ready" && "border-slate-400 bg-slate-100 text-slate-900 dark:border-slate-500 dark:bg-slate-700 dark:text-white"
                         )}
                       >
                         {statusLabels[item.status]}

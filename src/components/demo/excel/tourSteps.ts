@@ -14,12 +14,12 @@ export const tourSteps: TourStep[] = [
   {
     target: "submit",
     title: "Submit files",
-    description: "Submitted files move into Processing history so you can keep adding more files.",
+    description: "Kruzo sends the selected files with the active extraction template.",
   },
   {
     target: "settings",
-    title: "Optional settings",
-    description: "Most users can keep these defaults, but you can adjust them if needed.",
+    title: "Choose a template",
+    description: "Pick a preset or define custom fields before submitting documents.",
   },
   {
     target: "history",

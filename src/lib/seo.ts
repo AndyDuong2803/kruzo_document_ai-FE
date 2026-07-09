@@ -12,6 +12,7 @@ export type SeoRoute = {
   description: string;
   keywords?: string[];
   priority: number;
+  index?: boolean;
 };
 
 export const seoRoutes = {
@@ -60,6 +61,16 @@ export const seoRoutes = {
       "Learn how Kruzo Document AI API key access will support secure document data extraction workflows during beta.",
     keywords: ["OCR API keys", "document extraction API access"],
     priority: 0.5,
+    index: false,
+  },
+  login: {
+    path: "/login",
+    title: "Sign in to Kruzo Document AI",
+    description:
+      "Sign in to Kruzo Document AI with Google to access document workflows, extraction history, and API access when account features are enabled.",
+    keywords: ["Kruzo login", "Google login document AI", "document extraction account"],
+    priority: 0.6,
+    index: false,
   },
   pricing: {
     path: "/pricing",
@@ -88,6 +99,12 @@ export const createMetadata = (route: SeoRoute): Metadata => ({
   title: route.title,
   description: route.description,
   keywords: route.keywords,
+  robots: route.index === false
+    ? {
+        index: false,
+        follow: false,
+      }
+    : undefined,
   alternates: {
     canonical: absoluteUrl(route.path),
   },

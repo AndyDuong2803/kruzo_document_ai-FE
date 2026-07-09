@@ -10,13 +10,8 @@ export const tabs: PlaygroundTabOption[] = [
 
 export const modeOptions: ExtractModeOption[] = [
   {
-    id: "standard",
-    label: "Standard extract",
-    description: "Send only the document file to the default OCR extractor.",
-  },
-  {
     id: "custom",
-    label: "Custom template extract",
+    label: "Template extract",
     description: "Send the document file plus a JSON schema_sample.",
   },
 ];

@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { FiDownload, FiX } from "react-icons/fi";
 
+import type { WorkbookSheet } from "@/features/ocr/preview";
+
 import ExcelSheetViewer from "./ExcelSheetViewer";
-import type { ProcessedUpload, WorkbookSheet } from "./types";
+import type { ProcessedUpload } from "./types";
 
 type ResultPreviewModalProps = {
   result?: ProcessedUpload;
@@ -15,9 +17,9 @@ type ResultPreviewModalProps = {
 };
 
 const statusClassName: Record<ProcessedUpload["status"], string> = {
-  queued: "border-border bg-card text-muted",
-  processing: "border-amber-500 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500/20 dark:text-amber-100",
-  done: "border-emerald-600 bg-emerald-100 text-emerald-900 dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-emerald-100",
+  queued: "border-slate-400 bg-slate-100 text-slate-900 dark:border-slate-500 dark:bg-slate-700 dark:text-white",
+  processing: "border-amber-600 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500 dark:text-amber-950",
+  done: "border-emerald-700 bg-emerald-100 text-emerald-950 dark:border-emerald-300 dark:bg-emerald-500 dark:text-emerald-950",
   failed: "border-red-700 bg-red-600 text-white dark:border-red-400 dark:bg-red-500 dark:text-white",
 };
 

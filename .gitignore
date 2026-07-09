@@ -26,7 +26,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -34,3 +36,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local tooling and temporary output
+/.codegraph/
+/temp/
+/.codex/
+/.agents/
+
+# local dev server logs
+/.codex-next-start-*.log
+
+# editors and OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
