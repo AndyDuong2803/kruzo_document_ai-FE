@@ -30,7 +30,9 @@ const parseJsonResponse = async (response: Response) => {
 
 export const postMultipart = async <TData>(
   path: string,
-  formData: FormData
+  formData: FormData,
+  apiKey = "",
+  accessToken = ""
 ): Promise<ApiEnvelope<TData>> => {
   const url = buildOcrApiUrl(path);
 
@@ -45,6 +47,10 @@ export const postMultipart = async <TData>(
   try {
     response = await fetch(url, {
       method: "POST",
+      headers: {
+        ...(apiKey ? { "X-API-Key": apiKey } : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
       body: formData,
     });
   } catch (error) {

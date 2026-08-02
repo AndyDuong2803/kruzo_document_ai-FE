@@ -1,13 +1,13 @@
 export const UNKNOWN_OCR_ERROR_MESSAGE = "Something went wrong while processing the document.";
 
 const friendlyMessages: Record<string, string> = {
-  CRI_OCR_EXT_1000: "The OCR service could not authenticate with its AI provider. Please try again later.",
-  ERR_OCR_BIZ_2000: "The custom template JSON is invalid. Check schema_sample and try again.",
+  CRI_OCR_EXT_1000: "Document processing is temporarily unavailable. Please try again later.",
+  ERR_OCR_BIZ_2000: "This document type could not be prepared. Please try again.",
   WAR_OCR_BIZ_2001: "The file is too large for this demo. Try a smaller document.",
   WAR_OCR_BIZ_2002: "This file type is not supported. Upload a PDF, JPG, PNG, or WEBP file.",
   WAR_OCR_BIZ_2003: "The uploaded file appears to be empty. Choose another document.",
-  WAR_OCR_BIZ_2004: "The custom template is too large. Shorten schema_sample and try again.",
-  ERR_OCR_EXT_3000: "The OCR provider could not process the request right now. Check backend provider credentials or try again later.",
+  WAR_OCR_BIZ_2004: "This document type contains too many fields.",
+  ERR_OCR_EXT_3000: "The document could not be processed right now. Please try again later.",
   ERR_OCR_EXT_3001: "The AI could not structure this document. Try another file or request workflow help.",
 };
 

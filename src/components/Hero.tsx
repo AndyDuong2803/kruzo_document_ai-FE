@@ -1,101 +1,51 @@
-import React from 'react';
-import Link from 'next/link';
-import { HiArrowRight } from 'react-icons/hi2';
+import Link from "next/link";
+import { FiArrowRight, FiCheck, FiFileText } from "react-icons/fi";
 
-import { heroDetails } from '@/data/hero';
+import Container from "./Container";
 
-const Hero: React.FC = () => {
-    const inputDocuments = ['Repair order PDF', 'Scanned customer form', 'Vendor invoice'];
-    const extractedFields = [
-        ['customer_name', 'Maria Nguyen'],
-        ['document_type', 'Repair order'],
-        ['total_amount', '$428.60'],
-    ];
-    const animationDelay = (delay: number) => ({ "--animation-delay": `${delay}ms` } as React.CSSProperties);
+const Hero: React.FC = () => (
+  <section className="border-b border-border bg-hero-background px-5 pb-14 pt-28 md:pb-16 md:pt-32">
+    <Container>
+      <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="max-w-xl">
+          <h1 className="text-balance text-4xl font-semibold leading-tight md:text-5xl">Turn documents into Excel.</h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-muted md:text-lg">
+            Choose a document type, add multiple files, and download structured results.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-4">
+            <Link href="/upload" className="brand-button brand-button-primary gap-2 px-5 py-2.5">Process documents<FiArrowRight /></Link>
+            <Link href="/contact" className="brand-button brand-button-secondary px-5 py-2.5">Contact us</Link>
+          </div>
+          <p className="mt-4 text-sm text-muted">New accounts include 100 document credits.</p>
+        </div>
 
-    return (
-        <section
-            id="hero"
-            className="section-anchor relative flex items-center justify-center px-5 pb-0 pt-32 md:pt-40"
-        >
-            <div className="absolute left-0 top-0 bottom-0 -z-10 w-full">
-                <div className="brand-hero-grid absolute inset-0 h-full w-full">
-                </div>
+        <div className="brand-card overflow-hidden rounded-md" aria-label="Document processing preview">
+          <div className="border-b border-border px-4 py-3"><p className="text-sm font-semibold">Invoice processing</p></div>
+          <div className="grid md:grid-cols-[0.8fr_1.2fr]">
+            <div className="border-b border-border p-4 md:border-b-0 md:border-r">
+              <p className="text-xs font-semibold text-muted">Selected files</p>
+              <div className="mt-3 grid gap-2">
+                {["invoice-001.pdf", "invoice-002.pdf", "invoice-003.jpg"].map((file) => (
+                  <div key={file} className="flex items-center gap-2 rounded border border-border bg-card-muted p-2.5">
+                    <FiFileText className="text-primary" /><span className="min-w-0 flex-1 truncate text-xs font-semibold">{file}</span><FiCheck className="text-green-700" />
+                  </div>
+                ))}
+              </div>
             </div>
-
-            <div className="hero-bottom-fade absolute bottom-0 left-0 right-0 h-40 backdrop-blur-[2px]">
+            <div className="p-4">
+              <p className="text-xs font-semibold text-muted">Documents</p>
+              <div className="mt-3 overflow-hidden rounded border border-border">
+                <div className="grid grid-cols-3 bg-card-muted px-3 py-2 text-xs font-semibold"><span>Invoice number</span><span>Issue date</span><span>Total amount</span></div>
+                {[["INV-001", "Jul 18", "$1,250"], ["INV-002", "Jul 19", "$840"], ["INV-003", "Jul 21", "$2,100"]].map((row) => (
+                  <div key={row[0]} className="grid grid-cols-3 border-t border-border px-3 py-2 text-xs">{row.map((cell) => <span key={cell} className="truncate">{cell}</span>)}</div>
+                ))}
+              </div>
             </div>
-
-            <div className="w-full max-w-6xl text-center">
-                <p className="animate-fade-up mb-4 text-sm font-semibold uppercase tracking-wide text-secondary" style={animationDelay(40)}>{heroDetails.eyebrow}</p>
-                <h1 className="animate-fade-up text-4xl md:text-6xl md:leading-tight font-bold text-foreground max-w-lg md:max-w-3xl mx-auto" style={animationDelay(120)}>{heroDetails.heading}</h1>
-                <p className="animate-fade-up mt-4 text-muted max-w-2xl mx-auto" style={animationDelay(200)}>{heroDetails.subheading}</p>
-                <div className="animate-fade-up mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4" style={animationDelay(280)}>
-                    <Link href={heroDetails.primaryCta.href} className="brand-button brand-button-primary button-pop gap-2 px-7 py-3">
-                        {heroDetails.primaryCta.text}
-                        <HiArrowRight aria-hidden="true" />
-                    </Link>
-                    <Link href={heroDetails.secondaryCta.href} className="brand-button brand-button-secondary button-pop px-7 py-3">
-                        {heroDetails.secondaryCta.text}
-                    </Link>
-                </div>
-
-                <div className="animate-fade-up relative z-10 mx-auto mt-12 w-full max-w-5xl md:mt-16" style={animationDelay(380)}>
-                    <div className="soft-glow animate-float-slow overflow-hidden rounded-2xl border border-border bg-card text-left shadow-2xl">
-                    <div className="flex flex-col gap-3 border-b border-border bg-card-muted px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-sm font-semibold text-secondary">Document intake</p>
-                            <p className="text-sm text-muted">AI extraction with staff review</p>
-                        </div>
-                        <div className="flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-sm text-muted">
-                            <span className="h-2 w-2 rounded-full bg-primary"></span>
-                            Ready for review
-                        </div>
-                    </div>
-
-                    <div className="grid gap-0 lg:grid-cols-[1fr_0.75fr_1fr]">
-                        <div className="p-5 md:p-7">
-                            <p className="text-sm font-semibold uppercase tracking-wide text-muted">Input files</p>
-                            <div className="mt-5 space-y-3">
-                                {inputDocuments.map((documentName) => (
-                                    <div key={documentName} className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
-                                        <span className="font-semibold text-foreground">{documentName}</span>
-                                        <span className="text-sm text-muted">Queued</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="border-y border-border bg-card-muted p-5 md:p-7 lg:border-x lg:border-y-0">
-                            <p className="text-sm font-semibold uppercase tracking-wide text-muted">AI pass</p>
-                            <div className="mt-5 space-y-4 text-sm text-muted">
-                                <p className="rounded-xl border border-border bg-card p-4">Detects document type, tables, totals, customer fields, and low-confidence values.</p>
-                                <p className="rounded-xl border border-border bg-card p-4">Routes uncertain fields to a human review step before export.</p>
-                            </div>
-                        </div>
-
-                        <div className="p-5 md:p-7">
-                            <p className="text-sm font-semibold uppercase tracking-wide text-muted">Structured output</p>
-                            <div className="mt-5 overflow-hidden rounded-xl border border-border">
-                                {extractedFields.map(([field, value]) => (
-                                    <div key={field} className="grid grid-cols-[1fr_1.1fr] border-b border-border last:border-b-0">
-                                        <span className="bg-card-muted px-4 py-3 font-mono text-sm text-muted">{field}</span>
-                                        <span className="px-4 py-3 font-semibold text-foreground">{value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
-                                <span className="rounded-full border border-border bg-card-muted px-3 py-1 text-muted">Excel</span>
-                                <span className="rounded-full border border-border bg-card-muted px-3 py-1 text-muted">JSON</span>
-                                <span className="rounded-full border border-border bg-card-muted px-3 py-1 text-muted">Internal systems</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </section>
-    );
-};
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+);
 
 export default Hero;

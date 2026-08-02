@@ -19,7 +19,7 @@ export const getPlatformIconByName = (platformName: string): JSX.Element | null 
         }
         case 'twitter': {
             return <FaTwitter size={24} className='min-w-fit' />;
-        } 
+        }
         case 'youtube': {
             return <FaYoutube size={24} className='min-w-fit' />;
         }

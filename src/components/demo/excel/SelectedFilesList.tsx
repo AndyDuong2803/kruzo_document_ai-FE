@@ -7,102 +7,45 @@ import type { SelectedUpload } from "./types";
 
 type SelectedFilesListProps = {
   selectedFiles: SelectedUpload[];
-  embedded?: boolean;
-  highlighted?: boolean;
   onRemove: (id: string) => void;
   onClear: () => void;
 };
 
 const SelectedFilesList: React.FC<SelectedFilesListProps> = ({
   selectedFiles,
-  embedded = false,
-  highlighted = false,
   onRemove,
   onClear,
-}) => {
-  const selectedCountLabel = `${selectedFiles.length} document${selectedFiles.length === 1 ? "" : "s"} ready`;
+}) => (
+  <section className="border-t border-border p-5 md:p-6">
+    <div className="mb-4 flex items-center justify-between gap-3">
+      <h2 className="text-lg font-semibold">Selected files ({selectedFiles.length})</h2>
+      <button type="button" className="nav-link text-sm" onClick={onClear}>Clear all</button>
+    </div>
 
-  return (
-    <div
-      data-tour-target="fileList"
-      className={clsx(
-        embedded ? "bg-card px-4 py-4 md:px-5" : "brand-card rounded-2xl p-5",
-        highlighted && "guided-target-active"
-      )}
-    >
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold md:text-xl">Selected documents</h2>
-          <p className="text-sm text-muted">{selectedCountLabel}</p>
-        </div>
-        <button
-          type="button"
-          className="nav-link w-fit text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={onClear}
-          disabled={selectedFiles.length === 0}
-        >
-          Clear all
-        </button>
-      </div>
-
-      <div className={clsx("overflow-y-auto pr-1", maxFileListHeightClass)}>
-        {selectedFiles.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card-muted p-4 text-sm text-muted">
-            No documents selected yet. Add files, review them, then click Submit.
-          </div>
-        ) : (
-          <div className="grid gap-3">
-            {selectedFiles.map((item) => (
-              <div key={item.id} className="hover-lift rounded-xl border border-border bg-card-muted p-3">
-                <div className="flex items-start gap-3">
-                  <div className="brand-icon icon-chip flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-                    <FiFileText aria-hidden="true" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground" title={item.label}>
-                      {item.label}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                      <span>{formatFileSize(item.file.size)}</span>
-                      <span
-                        className={clsx(
-                          "rounded-full border px-2 py-0.5 font-semibold",
-                          item.status === "done" && "border-emerald-700 bg-emerald-100 text-emerald-950 dark:border-emerald-300 dark:bg-emerald-500 dark:text-emerald-950",
-                          item.status === "failed" && "border-red-700 bg-red-600 text-white dark:border-red-400 dark:bg-red-500 dark:text-white",
-                          item.status === "processing" && "border-amber-600 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500 dark:text-amber-950",
-                          item.status === "ready" && "border-slate-400 bg-slate-100 text-slate-900 dark:border-slate-500 dark:bg-slate-700 dark:text-white"
-                        )}
-                      >
-                        {statusLabels[item.status]}
-                      </span>
-                    </div>
-                    {item.message && <p className="mt-2 text-xs text-muted">{item.message}</p>}
-                  </div>
-                  <button
-                    type="button"
-                    className="rounded-full p-2 text-muted transition-colors hover:bg-card hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() => onRemove(item.id)}
-                    aria-label={`Remove ${item.label}`}
-                  >
-                    <FiTrash2 aria-hidden="true" />
-                  </button>
-                </div>
-
-                {item.status === "failed" && item.debugDetails && (
-                  <details className="mt-3 rounded-xl border border-border bg-card p-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-foreground">Technical details</summary>
-                    <pre className="mt-3 max-h-40 overflow-auto text-xs text-foreground">
-                      <code>{item.debugDetails}</code>
-                    </pre>
-                  </details>
-                )}
+    <div className={clsx("overflow-y-auto pr-1", maxFileListHeightClass)}>
+      <div className="grid gap-2">
+        {selectedFiles.map((item) => (
+          <div key={item.id} className="rounded border border-border p-3">
+            <div className="flex items-start gap-3">
+              <div className="brand-icon flex h-9 w-9 shrink-0 items-center justify-center rounded">
+                <FiFileText aria-hidden="true" />
               </div>
-            ))}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold" title={item.label}>{item.label}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
+                  <span>{formatFileSize(item.file.size)}</span>
+                  <span>{statusLabels[item.status]}</span>
+                </div>
+              </div>
+              <button type="button" className="rounded p-2 text-muted hover:bg-card-muted hover:text-foreground" onClick={() => onRemove(item.id)} aria-label={`Remove ${item.label}`}>
+                <FiTrash2 aria-hidden="true" />
+              </button>
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
-  );
-};
+  </section>
+);
 
 export default SelectedFilesList;

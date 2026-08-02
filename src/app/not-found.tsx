@@ -37,7 +37,7 @@ const NotFoundPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="brand-card rounded-2xl p-5 md:p-7">
+          <div className="brand-card rounded-xl p-5 md:p-7">
             <div className="brand-icon mb-5 flex h-12 w-12 items-center justify-center rounded-full">
               <FiCompass size={22} aria-hidden="true" />
             </div>

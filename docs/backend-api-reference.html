@@ -197,8 +197,8 @@
 
         <h3>Request example</h3>
         <pre><code>curl -X POST "https://api.smartocr.kruzo.tech/api/v1/ocr/extract-custom" \
-  -F "file=@repair-order.pdf" \
-  -F 'schema_sample={"type":"object","properties":{"customer_name":{"type":"string"},"total_amount":{"type":"string"}}}'</code></pre>
+  -F "file=@business-form.pdf" \
+  -F 'schema_sample={"customer_name":"","document_number":"","total_amount":""}'</code></pre>
 
         <h3>Success response</h3>
         <pre><code>{
@@ -206,25 +206,9 @@
   "error_code": null,
   "message": "Data extracted successfully.",
   "data": {
-    "fields": {
-      "customer_name": {
-        "value": "Maria Nguyen",
-        "confidence": 0.96,
-        "review_required": false
-      }
-    },
-    "tables": [
-      {
-        "name": "line_items",
-        "rows": [
-          { "item": "Oil change", "qty": 1, "amount": "89.00" }
-        ]
-      }
-    ],
-    "review": {
-      "status": "needs_review",
-      "reason": "Some fields have lower confidence."
-    }
+    "customer_name": "Maria Nguyen",
+    "document_number": "00127",
+    "total_amount": "89.00"
   }
 }</code></pre>
       </div>
@@ -241,7 +225,7 @@
             <tr><td>Invoice</td><td><code>vendor_name</code>, <code>customer_name</code>, <code>invoice_number</code>, <code>invoice_date</code>, <code>total_amount</code></td><td><code>line_items</code>: <code>item</code>, <code>qty</code>, <code>amount</code></td></tr>
             <tr><td>Certificate / Diploma</td><td><code>full_name</code>, <code>institution_name</code>, <code>certificate_name</code>, <code>major_or_program</code>, <code>issue_date</code></td><td>Không có mặc định</td></tr>
             <tr><td>Customer form</td><td><code>customer_name</code>, <code>phone_number</code>, <code>email</code>, <code>address</code>, <code>request_summary</code></td><td>Không có mặc định</td></tr>
-            <tr><td>Repair order</td><td><code>customer_name</code>, <code>repair_order_number</code>, <code>service_date</code>, <code>asset_or_vehicle</code>, <code>total_amount</code></td><td><code>service_items</code>: <code>service</code>, <code>qty</code>, <code>amount</code></td></tr>
+            <tr><td>Report or checklist</td><td><code>report_title</code>, <code>document_number</code>, <code>report_date</code>, <code>organization</code>, <code>summary</code></td><td><code>checklist_items</code>: <code>item</code>, <code>status</code>, <code>notes</code></td></tr>
             <tr><td>Custom fields</td><td>User tự thêm field. Frontend yêu cầu có ít nhất 1 field hoặc table column trước khi submit.</td><td>Optional custom table, mặc định tên <code>Items</code>.</td></tr>
           </tbody>
         </table>

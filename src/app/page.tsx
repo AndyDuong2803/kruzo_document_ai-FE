@@ -1,103 +1,105 @@
-import Hero from "@/components/Hero";
-import FAQ from "@/components/FAQ";
+import Link from "next/link";
+import {
+  FiArrowRight,
+  FiAward,
+  FiClipboard,
+  FiCreditCard,
+  FiFileText,
+  FiHome,
+  FiShoppingBag,
+} from "react-icons/fi";
+
 import Container from "@/components/Container";
-import Section from "@/components/Section";
-import CTA from "@/components/CTA";
+import FAQ from "@/components/FAQ";
+import Hero from "@/components/Hero";
 import StructuredData from "@/components/StructuredData";
-import Reveal from "@/components/Reveal";
-import { howItWorks, problemPoints, solutionWorkflow, useCases } from "@/data/landing";
-import { createMetadata, faqPageJsonLd, organizationJsonLd, seoRoutes, softwareApplicationJsonLd } from "@/lib/seo";
+import { documentPresets } from "@/config/document-presets";
+import {
+  createMetadata,
+  faqPageJsonLd,
+  organizationJsonLd,
+  seoRoutes,
+  softwareApplicationJsonLd,
+} from "@/lib/seo";
 
 export const metadata = createMetadata(seoRoutes.home);
 
-const HomePage: React.FC = () => {
-  return (
-    <>
-      <StructuredData data={[organizationJsonLd, softwareApplicationJsonLd, faqPageJsonLd]} />
-      <Hero />
-      <Container>
-        <Section
-          id="problem"
-          title="Manual document intake creates slow handoffs"
-          description="Service teams often receive useful business data trapped inside PDFs, scans, photos, invoices, repair notes, and customer forms."
-        >
-          <div className="grid gap-5 md:grid-cols-3">
-            {problemPoints.map((item, index) => (
-              <Reveal key={item.title} delay={index * 70} className="h-full">
-                <div className="brand-card hover-lift h-full rounded-xl p-6">
-                  <div className="brand-icon icon-chip mb-5 flex h-12 w-12 items-center justify-center rounded-full">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold">{item.title}</h3>
-                  <p className="mt-3 text-muted">{item.description}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Section>
-
-        <Section
-          id="workflow"
-          title="AI reads first, people stay in control"
-          description="Kruzo Document AI keeps the template workflow practical: extract, review, approve, then export in the format your team actually needs."
-        >
-          <div className="grid gap-5 lg:grid-cols-4">
-            {solutionWorkflow.map((step, index) => (
-              <Reveal key={step.eyebrow} delay={index * 60} className="h-full">
-                <div className="brand-card hover-lift h-full rounded-xl p-6">
-                  <p className="text-sm font-bold text-secondary">{step.eyebrow}</p>
-                  <h3 className="mt-4 text-xl font-semibold">{step.title}</h3>
-                  <p className="mt-3 text-muted">{step.description}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Section>
-
-        <Section
-          id="use-cases"
-          title="Built around service-business documents"
-          description="Use Kruzo for repeat document flows where staff need structured output without giving up review control."
-        >
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {useCases.map((item, index) => (
-              <Reveal key={item.title} delay={(index % 3) * 60} className="h-full">
-                <div className="brand-card hover-lift h-full rounded-xl p-6">
-                  <div className="brand-icon icon-chip mb-5 flex h-11 w-11 items-center justify-center rounded-full">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold">{item.title}</h3>
-                  <p className="mt-3 text-muted">{item.description}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Section>
-
-        <Section
-          id="how-it-works"
-          title="How the automation comes together"
-          description="The strongest workflow starts with your real documents, expected fields, and review rules instead of a generic one-size-fits-all setup."
-        >
-          <div className="grid gap-4 lg:grid-cols-4">
-            {howItWorks.map((step, index) => (
-              <Reveal key={step.eyebrow} delay={index * 60} className="h-full">
-                <div className="brand-card-muted hover-lift h-full border-l-4 border-l-primary p-6">
-                  <p className="text-sm font-bold uppercase tracking-wide text-secondary">{step.eyebrow}</p>
-                  <h3 className="mt-4 text-xl font-semibold">{step.title}</h3>
-                  <p className="mt-3 text-muted">{step.description}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Section>
-
-        <FAQ />
-        
-        <CTA />
-      </Container>
-    </>
-  );
+const presetIcons = {
+  "file-text": FiFileText,
+  receipt: FiShoppingBag,
+  "id-card": FiCreditCard,
+  bank: FiHome,
+  clipboard: FiClipboard,
+  award: FiAward,
 };
+
+const HomePage: React.FC = () => (
+  <>
+    <StructuredData data={[organizationJsonLd, softwareApplicationJsonLd, faqPageJsonLd]} />
+    <Hero />
+    <Container>
+      <section id="workflow" className="section-anchor py-12 md:py-16">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-primary">How it works</p>
+          <h2 className="mt-2 text-2xl font-semibold md:text-3xl">From document to Excel in three steps</h2>
+        </div>
+        <ol className="mt-7 grid overflow-hidden rounded-md border border-border bg-card md:grid-cols-3">
+          {["Choose a document type", "Add your files", "Download Excel"].map((step, index) => (
+            <li key={step} className="flex items-center gap-4 border-b border-border p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-primary bg-[var(--primary-subtle)] text-sm font-bold text-primary">{index + 1}</span>
+              <h3 className="text-base font-semibold">{step}</h3>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="border-t border-border py-12 md:py-16">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-primary">Ready to process</p>
+          <h2 className="mt-2 text-2xl font-semibold md:text-3xl">Supported document types</h2>
+        </div>
+        <div className="mt-7 grid overflow-hidden rounded-md border border-border bg-card sm:grid-cols-2 lg:grid-cols-3">
+          {documentPresets.map((preset) => {
+            const Icon = presetIcons[preset.icon as keyof typeof presetIcons] ?? FiFileText;
+            return (
+              <Link key={preset.id} href={`/upload?preset=${preset.id}`} className="group flex min-h-24 items-center gap-4 border-b border-border p-5 last:border-b-0 hover:bg-card-muted sm:border-r sm:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(3n)]:border-r-0 lg:[&:nth-last-child(-n+3)]:border-b-0">
+                <span className="brand-icon flex h-10 w-10 shrink-0 items-center justify-center rounded">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span>
+                  <span className="block font-semibold group-hover:text-primary">{preset.label}</span>
+                  {preset.description && <span className="mt-0.5 block text-xs text-muted">{preset.description}</span>}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="border-t border-border py-12 md:py-16">
+        <div className="grid gap-8 rounded-md border border-border bg-card p-6 md:grid-cols-[1fr_1fr_auto] md:items-start md:p-8">
+          <div>
+            <h2 className="text-xl font-semibold">Need another document type?</h2>
+            <p className="mt-2 text-sm leading-6 text-muted">Send us a sample document and the Excel format you need.</p>
+          </div>
+          <div className="md:border-l md:border-border md:pl-8">
+            <h2 className="text-xl font-semibold">Want your tools to work together?</h2>
+            <p className="mt-2 text-sm leading-6 text-muted">If your team copies information between email, spreadsheets, accounting tools, or other systems, we can build a clear workflow that moves it for you.</p>
+          </div>
+          <Link href="/contact" className="brand-button brand-button-primary px-5 py-2.5">Talk to us</Link>
+        </div>
+      </section>
+
+      <section className="border-y border-border py-6">
+        <Link href="/developers" className="inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-foreground">
+          Building an integration? View developer tools.
+          <FiArrowRight aria-hidden="true" />
+        </Link>
+      </section>
+
+      <FAQ />
+    </Container>
+  </>
+);
 
 export default HomePage;

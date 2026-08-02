@@ -1,11 +1,8 @@
-import type { ConfidenceLevel } from "./confidence";
-
 export type ReviewState = "Approved" | "Needs review" | "Unknown";
 
 export type PreviewRow = {
   field: string;
   value: string;
-  confidence: ConfidenceLevel;
   review: ReviewState;
 };
 

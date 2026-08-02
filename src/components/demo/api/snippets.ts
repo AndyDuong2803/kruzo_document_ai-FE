@@ -1,53 +1,65 @@
 type RequestSnippetOptions = {
+  apiKey: string;
   compactSchemaSample: string;
   endpoint: string;
   filePart: string;
   schemaSampleForExamples: string;
 };
 
-export const buildRequestSummary = ({ endpoint, filePart }: RequestSnippetOptions) => `Method: POST
-URL: ${endpoint}
-Content-Type: multipart/form-data
-Authentication: Not required for current OCR endpoint
-
-Fields:
-  file: ${filePart}
-  schema_sample: JSON schema string`;
+const apiKeyHeader = (apiKey: string) =>
+  apiKey ? `X-API-Key: ${apiKey}` : "";
 
 export const buildCurlCommand = ({
+  apiKey,
   compactSchemaSample,
   endpoint,
   filePart,
-}: RequestSnippetOptions) => `curl -X POST "${endpoint}" \\
+}: RequestSnippetOptions) => {
+  const header = apiKeyHeader(apiKey);
+  return `curl -X POST "${endpoint}" \\
+  ${header ? `-H "${header}" \\` : ""}
   -F "file=@${filePart}" \\
   -F 'schema_sample=${compactSchemaSample}'`;
+};
 
 export const buildFetchExample = ({
+  apiKey,
   endpoint,
   schemaSampleForExamples,
-}: RequestSnippetOptions) => `const formData = new FormData();
+}: RequestSnippetOptions) => {
+  const headers = apiKey
+    ? `\n  headers: { "X-API-Key": "${apiKey}" },`
+    : "";
+  return `const formData = new FormData();
 formData.append("file", fileInput.files[0]);
 formData.append("schema_sample", ${JSON.stringify(schemaSampleForExamples)});
 
 const response = await fetch("${endpoint}", {
-  method: "POST",
+  method: "POST",${headers}
   body: formData,
 });
 
 const result = await response.json();`;
+};
 
 export const buildPythonExample = ({
+  apiKey,
   endpoint,
   schemaSampleForExamples,
-}: RequestSnippetOptions) => `import requests
+}: RequestSnippetOptions) => {
+  const headers = apiKey
+    ? `\n        headers={"X-API-Key": "${apiKey}"},`
+    : "";
+  return `import requests
 
 schema_sample = """${schemaSampleForExamples}"""
 
-with open("repair-order.pdf", "rb") as file:
+with open("document.pdf", "rb") as file:
     response = requests.post(
-        "${endpoint}",
+        "${endpoint}",${headers}
         files={"file": file},
         data={"schema_sample": schema_sample},
     )
 
 result = response.json()`;
+};

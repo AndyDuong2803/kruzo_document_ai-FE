@@ -1,59 +1,61 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { hasConfiguredOcrApi } from "@/features/ocr/api";
-import type { WorkbookSheet } from "@/features/ocr/preview";
-
+import { useAuth } from "@/features/auth/AuthProvider";
+import { createBatch, saveCorrection } from "@/features/history/api";
 import {
-  defaultPreviewMessage,
-  reviewPreviewMessage,
-} from "./constants";
+  buildCombinedWorkbookBlob,
+  triggerDownload,
+  type BatchExportDocument,
+} from "@/features/ocr/export";
+
 import { createUploadId, fileKey, getFileRelativePath, isSupportedFile } from "./fileCollection";
-import { downloadSheetCsv, downloadWorkbook } from "./downloadResults";
-import { pluralFile, timeLabel } from "./historyLabels";
+import { timeLabel } from "./sessionLabels";
 import { processSubmittedUploads } from "./processUploads";
-import { useExtractionTemplate } from "./useExtractionTemplate";
+import { useDocumentPreset } from "./useDocumentPreset";
 import { useToastMessages } from "./useToastMessages";
 import type { CollectedFile, ProcessedUpload, SelectedUpload } from "./types";
+import type { DocumentPresetId } from "@/config/document-presets";
 
-export const useUploadQueue = () => {
+export const useUploadQueue = (initialPresetId?: DocumentPresetId) => {
   const [selectedFiles, setSelectedFiles] = useState<SelectedUpload[]>([]);
-  const [processingHistory, setProcessingHistory] = useState<ProcessedUpload[]>([]);
-  const [previewMessage, setPreviewMessage] = useState(defaultPreviewMessage);
+  const [sessionResults, setSessionResults] = useState<ProcessedUpload[]>([]);
   const [activeResultId, setActiveResultId] = useState<string | null>(null);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const template = useExtractionTemplate();
+  const presetState = useDocumentPreset(initialPresetId);
   const { dismissToast, pushToast, toasts } = useToastMessages();
+  const { token, user, credits, refreshCredits } = useAuth();
 
-  const completedFiles = useMemo(
-    () => processingHistory.filter((item) => item.status === "done" && item.preview),
-    [processingHistory]
-  );
   const activeProcessingCount = useMemo(
-    () => processingHistory.filter((item) => item.status === "queued" || item.status === "processing").length,
-    [processingHistory]
-  );
-  const failedFileCount = useMemo(
-    () => processingHistory.filter((item) => item.status === "failed").length,
-    [processingHistory]
+    () => sessionResults.filter((item) => item.status === "queued" || item.status === "processing").length,
+    [sessionResults]
   );
   const activeResultFile = activeResultId
-    ? processingHistory.find((item) => item.id === activeResultId)
+    ? sessionResults.find((item) => item.id === activeResultId)
     : undefined;
-  const isResultModalOpen = Boolean(activeResultFile);
   const submitLabel = selectedFiles.length === 1
-    ? "Submit 1 file"
+    ? "Extract 1 file"
     : selectedFiles.length > 1
-      ? `Submit ${selectedFiles.length} files`
-      : "Submit";
+      ? `Extract ${selectedFiles.length} files`
+      : "Extract";
   const processingLabel =
     activeProcessingCount > 0
-      ? `${activeProcessingCount} ${activeProcessingCount === 1 ? "file is" : "files are"} processing in history.`
+      ? `${activeProcessingCount} ${activeProcessingCount === 1 ? "file is" : "files are"} processing.`
       : "";
 
-  const updateHistoryItem = (id: string, patch: Partial<ProcessedUpload>) => {
-    setProcessingHistory((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
+  useEffect(() => {
+    if (activeProcessingCount === 0) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [activeProcessingCount]);
+
+  const updateSessionItem = (id: string, patch: Partial<ProcessedUpload>) => {
+    setSessionResults((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
   };
 
   const addCollectedFiles = (items: CollectedFile[]) => {
@@ -62,11 +64,13 @@ export const useUploadQueue = () => {
     }
 
     const supportedItems = items.filter((item) => isSupportedFile(item.file));
+    const validSizeItems = supportedItems.filter((item) => item.file.size > 0 && item.file.size <= 10 * 1024 * 1024);
     const unsupportedCount = items.length - supportedItems.length;
+    const invalidSizeCount = supportedItems.length - validSizeItems.length;
     const existingKeys = new Set(selectedFiles.map((item) => fileKey({ file: item.file, relativePath: item.label })));
     const uploadsToAdd: SelectedUpload[] = [];
 
-    supportedItems.forEach((item) => {
+    validSizeItems.slice(0, Math.max(0, 20 - selectedFiles.length)).forEach((item) => {
       const key = fileKey(item);
 
       if (existingKeys.has(key)) {
@@ -84,11 +88,16 @@ export const useUploadQueue = () => {
 
     if (uploadsToAdd.length > 0) {
       setSelectedFiles((current) => [...current, ...uploadsToAdd]);
-      setPreviewMessage(reviewPreviewMessage);
     }
 
     if (unsupportedCount > 0) {
       pushToast("Unsupported file ignored. Please use PDF, JPG, PNG, or WEBP.", "warning");
+    }
+    if (invalidSizeCount > 0) {
+      pushToast("Empty files and files larger than 10 MB were ignored.", "warning");
+    }
+    if (selectedFiles.length + validSizeItems.length > 20) {
+      pushToast("Your current account accepts 20 files per run. Contact us if you need a higher limit.", "warning");
     }
   };
 
@@ -102,11 +111,6 @@ export const useUploadQueue = () => {
 
   const clearFiles = () => {
     setSelectedFiles([]);
-
-    if (processingHistory.length === 0) {
-      setHasSubmitted(false);
-      setPreviewMessage(defaultPreviewMessage);
-    }
   };
 
   const closeResultModal = () => {
@@ -115,98 +119,127 @@ export const useUploadQueue = () => {
 
   const notifyDownload = (message: string) => pushToast(message, "success");
 
-  const downloadHistoryCsv = (id: string) => {
-    const historyItem = processingHistory.find((item) => item.id === id);
+  const completedExportDocuments = (batchId: string): BatchExportDocument[] =>
+    sessionResults
+      .filter((item) => item.batchId === batchId && item.status === "done" && item.rawResult)
+      .map((item) => ({
+        name: item.file.name,
+        status: "completed",
+        result: item.rawResult || null,
+        exportDefinition: item.exportDefinition,
+      }));
 
-    if (!historyItem || historyItem.status !== "done" || !historyItem.preview?.hasUsableData) {
-      return;
-    }
-
-    downloadSheetCsv(historyItem.preview.sheets.find((sheet) => sheet.rows.length > 0), historyItem.file.name, notifyDownload);
+  const downloadRun = (batchId: string) => {
+    const documents = completedExportDocuments(batchId);
+    if (!documents.length) return;
+    triggerDownload(
+      buildCombinedWorkbookBlob(documents),
+      `kruzo-document-ai-${batchId.slice(0, 8)}.xlsx`
+    );
+    notifyDownload("Your download is ready.");
   };
 
-  const downloadHistoryWorkbook = (id: string) => {
-    const historyItem = processingHistory.find((item) => item.id === id);
-
-    if (!historyItem || historyItem.status !== "done" || !historyItem.preview?.hasUsableData) {
-      return;
-    }
-
-    downloadWorkbook(historyItem.preview.sheets, historyItem.file.name, notifyDownload);
+  const processFiles = async (filesToProcess: ProcessedUpload[]) => {
+    if (!token) return;
+    await processSubmittedUploads({
+      filesToProcess,
+      pushToast,
+      schemaSample: JSON.stringify(filesToProcess[0]?.schemaSnapshot ?? presetState.selectedPreset.schemaSample),
+      updateSessionItem,
+      accessToken: token,
+      presetId: filesToProcess[0].presetId as DocumentPresetId,
+    });
+    await refreshCredits().catch(() => undefined);
   };
 
-  const downloadActiveCsv = (sheet?: WorkbookSheet) => {
-    if (!activeResultFile || activeResultFile.status !== "done" || !activeResultFile.preview?.hasUsableData) {
-      return;
-    }
-
-    downloadSheetCsv(sheet ?? activeResultFile.preview.sheets[0], activeResultFile.file.name, notifyDownload);
-  };
-
-  const downloadActiveWorkbook = () => {
-    if (!activeResultFile || activeResultFile.status !== "done" || !activeResultFile.preview?.hasUsableData) {
-      return;
-    }
-
-    downloadWorkbook(activeResultFile.preview.sheets, activeResultFile.file.name, notifyDownload);
-  };
-
-  const submitSelectedFiles = () => {
+  const submitSelectedFiles = async () => {
     if (selectedFiles.length === 0) {
       return;
     }
 
-    setHasSubmitted(true);
-
     if (!hasConfiguredOcrApi) {
       pushToast("OCR API endpoint is not configured.", "error");
-      setPreviewMessage("OCR API endpoint is not configured. No extraction preview is available.");
       return;
     }
-
-    if (!template.templateReady) {
-      pushToast("Add at least one custom field or table column before submitting.", "warning");
-      setPreviewMessage("Choose a template or add custom fields before submitting.");
+    if (!token || !user) {
+      pushToast("Sign in before processing documents.", "warning");
+      return;
+    }
+    if (!credits || credits.balance < selectedFiles.length) {
+      pushToast("You do not have enough credits. Contact us on Telegram to add more.", "warning");
       return;
     }
 
     const submittedAt = new Date();
-    const filesToProcess: ProcessedUpload[] = selectedFiles.map((item) => ({
+    const preset = presetState.selectedPreset;
+    let batch;
+    try {
+      batch = await createBatch(token, {
+        output_format: "xlsx",
+        output_organization: "combined",
+        documents: selectedFiles.map((item) => ({
+          original_file_name: item.file.name,
+          mime_type: item.file.type || "application/octet-stream",
+          file_size: item.file.size,
+          requested_field_configuration: preset.schemaSample,
+          preset_id: preset.id,
+          preset_version: preset.version,
+          schema_snapshot: preset.schemaSample,
+          export_definition_snapshot: preset.exportDefinition,
+        })),
+      });
+    } catch (cause) {
+      pushToast(cause instanceof Error ? cause.message : "Could not create the document batch.", "error");
+      return;
+    }
+    const filesToProcess: ProcessedUpload[] = selectedFiles.map((item, index) => ({
       ...item,
       status: "queued",
       message: "Waiting to process...",
       submittedAt: submittedAt.toISOString(),
       submittedAtLabel: timeLabel(submittedAt),
+      batchId: batch.id,
+      extractionDocumentId: batch.documents[index]?.id,
+      presetId: preset.id,
+      presetVersion: preset.version,
+      schemaSnapshot: preset.schemaSample,
+      exportDefinition: preset.exportDefinition,
     }));
 
     setSelectedFiles([]);
-    setProcessingHistory((current) => [...filesToProcess, ...current]);
-    setPreviewMessage(`${pluralFile(filesToProcess.length)} submitted. Track progress in Processing history.`);
-    pushToast(`Submitted ${filesToProcess.length} ${filesToProcess.length === 1 ? "file" : "files"} for extraction.`, "info");
+    setSessionResults((current) => [...filesToProcess, ...current]);
+    pushToast(`Started extraction for ${filesToProcess.length} ${filesToProcess.length === 1 ? "file" : "files"}.`, "info");
 
-    void processSubmittedUploads({
-      filesToProcess,
-      pushToast,
-      schemaSample: template.schemaSample,
-      setPreviewMessage,
-      updateHistoryItem,
-    });
+    void processFiles(filesToProcess);
+  };
+
+  const retryFailed = (id: string) => {
+    const item = sessionResults.find((result) => result.id === id && result.status === "failed");
+    if (!item || !token) return;
+    updateSessionItem(item.id, { status: "queued", message: "Waiting to retry…" });
+    void processFiles([{ ...item, status: "queued" }]);
+  };
+
+  const saveCorrectedResult = async (id: string, result: Record<string, unknown>) => {
+    const item = sessionResults.find((candidate) => candidate.id === id);
+    if (!item?.extractionDocumentId || !token) return;
+    await saveCorrection(token, item.extractionDocumentId, result);
+    updateSessionItem(id, { rawResult: result });
+    pushToast("Corrected result saved.", "success");
   };
 
   return {
     selectedFiles,
-    processingHistory,
-    previewMessage,
+    sessionResults,
     processingLabel,
     submitLabel,
-    hasSubmitted,
-    completedFiles,
-    failedFileCount,
     activeProcessingCount,
     activeResultFile,
-    isResultModalOpen,
     toasts,
-    ...template,
+    ...presetState,
+    token,
+    user,
+    credits,
     addCollectedFiles,
     showFolderUnsupportedToast,
     removeFile,
@@ -214,10 +247,9 @@ export const useUploadQueue = () => {
     submitSelectedFiles,
     selectActiveResult: setActiveResultId,
     closeResultModal,
-    downloadActiveCsv,
-    downloadActiveWorkbook,
-    downloadHistoryCsv,
-    downloadHistoryWorkbook,
+    downloadRun,
+    retryFailed,
+    saveCorrectedResult,
     dismissToast,
   };
 };

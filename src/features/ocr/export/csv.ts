@@ -1,4 +1,4 @@
-import type { PreviewRow, WorkbookSheet } from "@/features/ocr/preview";
+import type { PreviewRow } from "@/features/ocr/preview";
 import { fieldsSheetFromRows } from "@/features/ocr/preview/sheets";
 import { isUserFacingPreviewRow } from "@/features/ocr/preview";
 
@@ -6,7 +6,7 @@ const csvBom = "\uFEFF";
 
 const escapeCsvCell = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
 
-export const buildCsvFromSheet = (sheet: WorkbookSheet) => {
+export const buildCsvFromSheet = (sheet: { columns: string[]; rows: unknown[][] }) => {
   const csvRows = [sheet.columns, ...sheet.rows].map((row) => row.map(escapeCsvCell).join(","));
 
   return `${csvBom}${csvRows.join("\n")}`;

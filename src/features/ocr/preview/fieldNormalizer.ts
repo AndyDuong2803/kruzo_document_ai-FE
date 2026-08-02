@@ -1,4 +1,3 @@
-import { confidenceLevelFromValue } from "./confidence";
 import {
   humanizeFieldName,
   isLargeTextBlob,
@@ -10,17 +9,13 @@ import {
 } from "./utils";
 import type { PreviewRow, ReviewState } from "./types";
 
-const reviewStateFromField = (fieldValue: Record<string, unknown>, confidence: unknown): ReviewState => {
+const reviewStateFromField = (fieldValue: Record<string, unknown>): ReviewState => {
   if (fieldValue.review_required === true || fieldValue.needs_review === true) {
     return "Needs review";
   }
 
   if (fieldValue.review_required === false || fieldValue.needs_review === false) {
     return "Approved";
-  }
-
-  if (typeof confidence === "number") {
-    return confidence <= 0.8 || (confidence > 1 && confidence <= 80) ? "Needs review" : "Approved";
   }
 
   return "Unknown";
@@ -70,13 +65,10 @@ const rowFromField = (key: string, value: unknown, includeEmpty = false): Previe
       return null;
     }
 
-    const confidence = value.confidence ?? value.score ?? value.confidence_level;
-
     return {
       field: humanizeFieldName(key),
       value: sanitizedValue,
-      confidence: confidenceLevelFromValue(confidence),
-      review: reviewStateFromField(value, confidence),
+      review: reviewStateFromField(value),
     };
   }
 
@@ -99,8 +91,7 @@ const rowFromField = (key: string, value: unknown, includeEmpty = false): Previe
   return {
     field: humanizeFieldName(key),
     value: sanitizedValue,
-    confidence: "Medium",
-    review: "Approved",
+    review: "Unknown",
   };
 };
 

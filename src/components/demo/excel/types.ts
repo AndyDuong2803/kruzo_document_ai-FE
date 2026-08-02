@@ -1,9 +1,8 @@
 import type { OcrPreview, WorkbookSheet } from "@/features/ocr/preview";
-
-export type TourTarget = "upload" | "fileList" | "submit" | "settings" | "history" | "modalPreview";
+import type { ExportDefinition } from "@/config/document-presets";
 
 export type FileStatus = "ready" | "processing" | "done" | "failed";
-export type HistoryStatus = "queued" | "processing" | "done" | "failed";
+export type SessionStatus = "queued" | "processing" | "done" | "failed" | "cancelled";
 
 export type SelectedUpload = {
   id: string;
@@ -13,14 +12,21 @@ export type SelectedUpload = {
   message?: string;
   debugDetails?: string;
   preview?: OcrPreview;
+  rawResult?: Record<string, unknown>;
 };
 
 export type ProcessedUpload = Omit<SelectedUpload, "status"> & {
-  status: HistoryStatus;
+  status: SessionStatus;
   submittedAt: string;
   submittedAtLabel: string;
   processedAt?: string;
   processedAtLabel?: string;
+  batchId?: string;
+  extractionDocumentId?: string;
+  presetId: string;
+  presetVersion: number;
+  schemaSnapshot: Record<string, unknown>;
+  exportDefinition: ExportDefinition;
 };
 
 export type CollectedFile = {
@@ -43,12 +49,6 @@ export type ToastMessage = {
   id: string;
   message: string;
   tone: ToastTone;
-};
-
-export type TourStep = {
-  target: TourTarget;
-  title: string;
-  description: string;
 };
 
 export type DemoOption = {

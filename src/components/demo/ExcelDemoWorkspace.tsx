@@ -1,196 +1,129 @@
 "use client";
 
 import Link from "next/link";
-import { FiHelpCircle } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
 
 import Container from "@/components/Container";
-
+import type { DocumentPresetId } from "@/config/document-presets";
+import {
+  contactPath,
+  telegramCreditsUrl,
+  telegramHigherLimitUrl,
+} from "@/data/product";
 import ExtractionSettings from "./excel/ExtractionSettings";
-import ProcessingHistory from "./excel/ProcessingHistory";
 import ResultPreviewModal from "./excel/ResultPreviewModal";
 import SelectedFilesList from "./excel/SelectedFilesList";
-import SubmitPanel from "./excel/SubmitPanel";
+import SessionResults from "./excel/SessionResults";
 import Toast from "./excel/Toast";
 import UploadDropzone from "./excel/UploadDropzone";
-import { tourSteps } from "./excel/tourSteps";
-import { useGuidedTour } from "./excel/useGuidedTour";
 import { useUploadQueue } from "./excel/useUploadQueue";
 
-const ExcelDemoWorkspace: React.FC = () => {
-  const {
-    selectedFiles,
-    processingHistory,
-    customFields,
-    customTableColumns,
-    customTableEnabled,
-    customTableName,
-    selectedTemplateId,
-    templateReady,
-    processingLabel,
-    submitLabel,
-    activeResultFile,
-    toasts,
-    setCustomTableEnabled,
-    setCustomTableName,
-    setSelectedTemplateId,
-    addCustomField,
-    addCustomTableColumn,
-    removeCustomField,
-    removeCustomTableColumn,
-    updateCustomField,
-    updateCustomTableColumn,
-    addCollectedFiles,
-    showFolderUnsupportedToast,
-    removeFile,
-    clearFiles,
-    submitSelectedFiles,
-    selectActiveResult,
-    closeResultModal,
-    downloadActiveCsv,
-    downloadActiveWorkbook,
-    downloadHistoryCsv,
-    downloadHistoryWorkbook,
-    dismissToast,
-  } = useUploadQueue();
-  const {
-    tourOpen,
-    tourIndex,
-    currentStep,
-    progressLabel,
-    dismissTour,
-    restartTour,
-    goNext,
-    goBack,
-    isTargetActive,
-  } = useGuidedTour(tourSteps);
+type ExcelDemoWorkspaceProps = {
+  initialPresetId?: DocumentPresetId;
+};
+
+const ExcelDemoWorkspace: React.FC<ExcelDemoWorkspaceProps> = ({ initialPresetId }) => {
+  const queue = useUploadQueue(initialPresetId);
+  const canSubmit =
+    queue.selectedFiles.length > 0 &&
+    Boolean(queue.token) &&
+    Boolean(queue.credits && queue.credits.balance >= queue.selectedFiles.length) &&
+    queue.activeProcessingCount === 0;
 
   return (
-    <section className="relative overflow-hidden px-5 pb-14 pt-24 md:pt-28">
-      <div className="brand-hero-grid absolute inset-0 -z-10 opacity-70"></div>
-
-      {tourOpen && <div className="fixed inset-0 z-40 bg-black/55 backdrop-blur-[1px]" aria-hidden="true"></div>}
-
+    <section className="px-5 pb-14 pt-24 md:pt-28">
       <Container>
         <div className="mx-auto max-w-7xl">
-          <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Extract Document</p>
-              <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">Template-based document extraction</h1>
-              <p className="mt-3 max-w-2xl text-muted">
-                Choose a template, add files, then extract only the requested fields.
-              </p>
+          <div className="mb-6">
+            <h1 className="text-3xl font-semibold md:text-4xl">Process documents</h1>
+            <p className="mt-3 max-w-2xl text-muted">
+              Choose a document type, add your files, and download the results in Excel.
+            </p>
+          </div>
+
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="brand-card overflow-hidden rounded-md">
+              <ExtractionSettings
+                selectedPresetId={queue.selectedPresetId}
+                onPresetChange={queue.setSelectedPresetId}
+              />
+              <UploadDropzone
+                selectedCount={queue.selectedFiles.length}
+                onAddFiles={queue.addCollectedFiles}
+                onFolderDropped={queue.showFolderUnsupportedToast}
+              />
+              {queue.selectedFiles.length > 0 && (
+                <SelectedFilesList
+                  selectedFiles={queue.selectedFiles}
+                  onRemove={queue.removeFile}
+                  onClear={queue.clearFiles}
+                />
+              )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <aside className="brand-card rounded-md p-5 lg:sticky lg:top-24">
+              <h2 className="text-lg font-semibold">Output</h2>
+              <dl className="mt-4 grid gap-3 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">Selected files</dt>
+                  <dd className="font-semibold">{queue.selectedFiles.length}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">Credits</dt>
+                  <dd className="font-semibold">{queue.credits ? queue.credits.balance : "Sign in to view"}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">File type</dt>
+                  <dd className="font-semibold">Excel (.xlsx)</dd>
+                </div>
+              </dl>
+
+              {!queue.user && (
+                <Link href="/login?next=/upload" className="brand-button brand-button-secondary mt-5 w-full px-4 py-2.5">
+                  Sign in to process
+                </Link>
+              )}
               <button
                 type="button"
-                className="brand-button brand-button-secondary button-pop gap-2 px-4 py-2.5 text-sm"
-                onClick={restartTour}
+                className="brand-button brand-button-primary mt-3 w-full gap-2 px-4 py-3"
+                onClick={() => void queue.submitSelectedFiles()}
+                disabled={!canSubmit}
               >
-                <FiHelpCircle aria-hidden="true" />
-                Guide me
+                {queue.selectedFiles.length
+                  ? `Process ${queue.selectedFiles.length} document${queue.selectedFiles.length === 1 ? "" : "s"}`
+                  : "Process documents"}
+                <FiArrowRight aria-hidden="true" />
               </button>
-              <Link href="/try/api" className="nav-link text-sm font-semibold">
-                Developer? Open API Integration
-              </Link>
-            </div>
+              {queue.processingLabel && (
+                <p className="mt-2 text-xs leading-5 text-muted" aria-live="polite">{queue.processingLabel}</p>
+              )}
+              <div className="mt-4 grid gap-2 border-t border-border pt-4 text-sm">
+                <a href={telegramCreditsUrl} target="_blank" rel="noreferrer" className="nav-link">Buy more credits</a>
+                <a href={telegramHigherLimitUrl} target="_blank" rel="noreferrer" className="nav-link">Need to process more files?</a>
+                <Link href={contactPath} className="nav-link">Custom setup</Link>
+              </div>
+            </aside>
           </div>
 
-          <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
-            <div className="grid min-w-0 gap-4">
-              <UploadDropzone
-                selectedCount={selectedFiles.length}
-                highlighted={isTargetActive("upload")}
-                onAddFiles={addCollectedFiles}
-                onFolderDropped={showFolderUnsupportedToast}
-              />
-
-              <SelectedFilesList
-                selectedFiles={selectedFiles}
-                highlighted={isTargetActive("fileList")}
-                onRemove={removeFile}
-                onClear={clearFiles}
-              />
-
-              <SubmitPanel
-                canSubmit={selectedFiles.length > 0 && templateReady}
-                selectedCount={selectedFiles.length}
-                submitLabel={submitLabel}
-                processingLabel={processingLabel}
-                highlighted={isTargetActive("submit")}
-                onSubmit={submitSelectedFiles}
-              />
-
-              <ExtractionSettings
-                customFields={customFields}
-                customTableColumns={customTableColumns}
-                customTableEnabled={customTableEnabled}
-                customTableName={customTableName}
-                highlighted={isTargetActive("settings")}
-                selectedTemplateId={selectedTemplateId}
-                onAddCustomField={addCustomField}
-                onAddCustomTableColumn={addCustomTableColumn}
-                onCustomTableEnabledChange={setCustomTableEnabled}
-                onCustomTableNameChange={setCustomTableName}
-                onRemoveCustomField={removeCustomField}
-                onRemoveCustomTableColumn={removeCustomTableColumn}
-                onTemplateChange={setSelectedTemplateId}
-                onUpdateCustomField={updateCustomField}
-                onUpdateCustomTableColumn={updateCustomTableColumn}
-              />
-            </div>
-
-            <ProcessingHistory
-              history={processingHistory}
-              activeResultId={activeResultFile?.id}
-              highlighted={isTargetActive("history")}
-              modalHighlighted={isTargetActive("modalPreview")}
-              onViewResult={selectActiveResult}
-              onDownloadCsv={downloadHistoryCsv}
-              onDownloadWorkbook={downloadHistoryWorkbook}
+          {queue.sessionResults.length > 0 && (
+            <SessionResults
+              items={queue.sessionResults}
+              activeResultId={queue.activeResultFile?.id}
+              onViewResult={queue.selectActiveResult}
+              onDownloadRun={queue.downloadRun}
+              onRetry={queue.retryFailed}
             />
-          </div>
+          )}
         </div>
       </Container>
 
       <ResultPreviewModal
-        result={activeResultFile}
-        onClose={closeResultModal}
-        onDownloadCsv={downloadActiveCsv}
-        onDownloadWorkbook={downloadActiveWorkbook}
+        result={queue.activeResultFile}
+        onClose={queue.closeResultModal}
+        onSave={queue.saveCorrectedResult}
+        onRetry={queue.retryFailed}
       />
-      <Toast toasts={toasts} onDismiss={dismissToast} />
-
-      {tourOpen && currentStep && (
-        <div
-          className="guided-tour-card fixed bottom-5 left-5 right-5 z-[70] mx-auto max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl md:bottom-8 md:left-auto md:right-8"
-          role="dialog"
-          aria-live="polite"
-          aria-label="Kruzo demo guide"
-        >
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <p className="text-sm font-semibold uppercase tracking-wide text-secondary">{progressLabel}</p>
-            <button type="button" className="nav-link text-sm font-semibold" onClick={dismissTour}>
-              Skip
-            </button>
-          </div>
-          <h2 className="text-xl font-semibold">{currentStep.title}</h2>
-          <p className="mt-2 text-muted">{currentStep.description}</p>
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              className="brand-button brand-button-secondary button-pop px-4 py-2 text-sm"
-              onClick={goBack}
-              disabled={tourIndex === 0}
-            >
-              Back
-            </button>
-            <button type="button" className="brand-button brand-button-primary button-pop px-5 py-2 text-sm" onClick={goNext}>
-              {tourIndex === tourSteps.length - 1 ? "Finish" : "Next"}
-            </button>
-          </div>
-        </div>
-      )}
+      <Toast toasts={queue.toasts} onDismiss={queue.dismissToast} />
     </section>
   );
 };

@@ -1,26 +1,14 @@
 export type SendState = "idle" | "loading" | "success" | "error";
-export type PlaygroundTab = "request" | "curl" | "javascript" | "python" | "response";
-export type ExtractMode = "custom";
+export type CodeExampleTab = "curl" | "javascript" | "python";
+export type SchemaTemplateId = "general" | "business_form" | "table_document";
 
-export type PlaygroundTabOption = {
-  id: PlaygroundTab;
+export type CodeExampleOption = {
+  id: CodeExampleTab;
   label: string;
 };
 
-export type ExtractModeOption = {
-  id: ExtractMode;
+export type SchemaTemplate = {
+  id: SchemaTemplateId;
   label: string;
-  description: string;
-};
-
-export type ApiHistoryItem = {
-  id: string;
-  timeLabel: string;
-  endpointPath: string;
-  filename: string;
-  mode: ExtractMode;
-  status: "success" | "error";
-  requestSummary: string;
-  responseJson: string;
-  message: string;
+  value: string;
 };

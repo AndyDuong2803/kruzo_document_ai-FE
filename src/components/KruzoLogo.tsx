@@ -18,7 +18,7 @@ const KruzoLogo: React.FC<KruzoLogoProps> = ({
 
     return (
         <span className={clsx("inline-flex items-center gap-2.5", className)}>
-            <span className={clsx("logo-mark h-10 w-10 rounded-xl", iconClassName)} aria-hidden="true">
+            <span className={clsx("logo-mark h-10 w-10 rounded-lg", iconClassName)} aria-hidden="true">
                 <svg viewBox="0 0 48 48" className="h-8 w-8" role="img">
                     <path
                         d="M12 5.5h17.7L38 13.8v25.7c0 2.2-1.8 4-4 4H12c-2.2 0-4-1.8-4-4v-30c0-2.2 1.8-4 4-4Z"
@@ -60,9 +60,9 @@ const KruzoLogo: React.FC<KruzoLogoProps> = ({
             </span>
 
             {showWordmark && (
-                <span className={clsx("manrope leading-none", textClassName)}>
-                    <span className="block text-xl font-bold tracking-normal text-foreground">Kruzo</span>
-                    <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted">Document AI</span>
+                <span className={clsx("leading-none", textClassName)}>
+                    <span className="block text-base font-bold tracking-normal text-foreground sm:text-lg">Kruzo</span>
+                    <span className="block text-[10px] font-semibold tracking-[0.06em] text-muted sm:text-xs">Document AI</span>
                 </span>
             )}
         </span>

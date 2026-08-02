@@ -2,8 +2,8 @@ export const siteDetails = {
     siteName: 'Kruzo Document AI',
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://document-ai.kruzo.tech',
     metadata: {
-        title: 'Kruzo Document AI - AI Document Automation for Service Businesses',
-        description: 'Extract data from PDFs, scanned forms, invoices, repair documents, and customer files into Excel, JSON, or internal systems using AI.',
+        title: 'Kruzo Document AI - Documents to Excel',
+        description: 'Upload PDFs or images, choose the information you need, and download a clean Excel file.',
     },
     language: 'en-us',
     locale: 'en-US',

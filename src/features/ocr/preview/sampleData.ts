@@ -1,50 +1,22 @@
 import { ApiEnvelope, OcrData } from "@/features/ocr/api";
 
-import type { PreviewRow } from "./types";
-
-export const samplePreviewRows: PreviewRow[] = [
-  { field: "Customer name", value: "Maria Nguyen", confidence: "High", review: "Approved" },
-  { field: "Invoice number", value: "INV-1048", confidence: "High", review: "Approved" },
-  { field: "Total amount", value: "$428.60", confidence: "High", review: "Approved" },
-  { field: "Service notes", value: "Brake inspection and oil change", confidence: "Medium", review: "Needs review" },
-];
-
 export const sampleOcrData: OcrData = {
   fields: {
-    customer_name: {
-      value: "Maria Nguyen",
-      confidence: 0.96,
-      review_required: false,
-    },
-    invoice_number: {
-      value: "INV-1048",
-      confidence: 0.94,
-      review_required: false,
-    },
-    total_amount: {
-      value: "428.60",
-      confidence: 0.91,
-      review_required: false,
-    },
-    service_notes: {
-      value: "Brake inspection and oil change",
-      confidence: 0.72,
-      review_required: true,
-    },
+    organization: { value: "Northline Services", review_required: false },
+    reference_number: { value: "001048", review_required: false },
+    submitted_date: { value: "2026-07-18", review_required: false },
+    notes: { value: "Supporting page is not fully clear", review_required: true },
   },
   tables: [
     {
-      name: "line_items",
+      name: "items",
       rows: [
-        { item: "Oil change", qty: 1, amount: "89.00" },
-        { item: "Brake inspection", qty: 1, amount: "120.00" },
+        { description: "Application form", quantity: 1 },
+        { description: "Supporting record", quantity: 2 },
       ],
     },
   ],
-  review: {
-    status: "needs_review",
-    reason: "Some service notes have lower confidence.",
-  },
+  review: { status: "needs_review", reason: "One value needs checking." },
 };
 
 export const sampleOcrResponse: ApiEnvelope<OcrData> = {

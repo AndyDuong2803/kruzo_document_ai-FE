@@ -18,67 +18,61 @@ export type SeoRoute = {
 export const seoRoutes = {
   home: {
     path: "/",
-    title: "Kruzo Document AI - AI Document Automation for Service Businesses",
+    title: "Kruzo Document AI - Documents to Excel",
     description:
-      "Extract data from PDFs, scanned forms, invoices, repair documents, and customer files into Excel, JSON, or internal systems using AI.",
+      "Upload PDFs or images, choose the information you need, and download a clean Excel file.",
     keywords: [
       "AI document extraction",
       "document to Excel automation",
-      "OCR for invoices",
-      "OCR for scanned forms",
-      "repair document extraction",
+      "business document processing",
+      "scanned forms to Excel",
     ],
     priority: 1,
   },
   try: {
-    path: "/try",
-    title: "Try Kruzo Document AI - Document to Excel Demo",
+    path: "/upload",
+    title: "Process Documents - Kruzo Document AI",
     description:
-      "Upload sample documents and preview how Kruzo turns PDFs, scans, invoices, and repair documents into Excel-ready tables.",
+      "Choose a document type, process files together, and download organized Excel results.",
     keywords: ["document to Excel demo", "AI document extraction demo", "invoice OCR demo"],
     priority: 0.9,
   },
   apiPlayground: {
     path: "/try/api",
-    title: "Kruzo Document AI API Playground",
+    title: "API Playground - Kruzo Document AI",
     description:
-      "Test the Kruzo Document AI OCR API with PDF, image, and custom schema extraction examples.",
+      "Test the Kruzo Document AI API with a document file and editable JSON template.",
     keywords: ["document data extraction API", "OCR API playground", "custom schema extraction"],
     priority: 0.8,
   },
   docs: {
     path: "/docs",
-    title: "Kruzo Document AI API Docs",
+    title: "API Documentation - Kruzo Document AI",
     description:
-      "Developer documentation for extracting structured data from documents using the Kruzo Document AI API.",
+      "Developer documentation for processing documents with Kruzo Document AI.",
     keywords: ["document data extraction API docs", "OCR API documentation", "document extraction developer API"],
     priority: 0.8,
   },
-  apiKeys: {
-    path: "/api-keys",
-    title: "Kruzo Document AI API Keys - Beta Access",
-    description:
-      "Learn how Kruzo Document AI API key access will support secure document data extraction workflows during beta.",
-    keywords: ["OCR API keys", "document extraction API access"],
-    priority: 0.5,
-    index: false,
+  developers: {
+    path: "/developers",
+    title: "Developers - Kruzo Document AI",
+    description: "Developer tools and documentation for Kruzo Document AI.",
+    priority: 0.6,
+  },
+  contact: {
+    path: "/contact",
+    title: "Contact - Kruzo Document AI",
+    description: "Tell us which documents and Excel output your business needs.",
+    priority: 0.7,
   },
   login: {
     path: "/login",
     title: "Sign in to Kruzo Document AI",
     description:
-      "Sign in to Kruzo Document AI with Google to access document workflows, extraction history, and API access when account features are enabled.",
-    keywords: ["Kruzo login", "Google login document AI", "document extraction account"],
+      "Sign in to Kruzo Document AI with email, password, or Google.",
+    keywords: ["Kruzo login", "Google login", "document extraction account"],
     priority: 0.6,
     index: false,
-  },
-  pricing: {
-    path: "/pricing",
-    title: "Kruzo Document AI Pricing - Workflow Audit and Pilot Options",
-    description:
-      "Review free workflow audit, paid pilot, and custom workflow options for AI document automation projects.",
-    keywords: ["AI document automation pricing", "document extraction pilot", "OCR workflow audit"],
-    priority: 0.7,
   },
 } satisfies Record<string, SeoRoute>;
 
@@ -141,18 +135,12 @@ export const softwareApplicationJsonLd = {
   operatingSystem: "Web",
   url: canonicalDomain,
   description: seoRoutes.home.description,
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-    description: "Free workflow audit available before paid pilot work.",
-  },
 };
 
 export const tryWebApplicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "Kruzo Document AI Document to Excel Demo",
+  name: "Kruzo Document AI",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: absoluteUrl(seoRoutes.try.path),

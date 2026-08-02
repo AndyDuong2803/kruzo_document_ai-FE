@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Source_Sans_3, Manrope } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/toast/ToastProvider";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import { siteDetails } from '@/data/siteDetails';
 import { canonicalDomain, createMetadata, seoRoutes } from "@/lib/seo";
 
 import "./globals.css";
 
-const manrope = Manrope({ subsets: ['latin'] });
-const sourceSans = Source_Sans_3({ subsets: ['latin'] });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
 const themeInitScript = `
   (function() {
     try {
       var storedTheme = localStorage.getItem('kruzo-theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var shouldUseDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+      var shouldUseDark = storedTheme === 'dark';
       document.documentElement.classList.toggle('dark', shouldUseDark);
       document.documentElement.dataset.theme = shouldUseDark ? 'dark' : 'light';
     } catch (error) {
@@ -46,16 +45,16 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body
-        className={`${manrope.className} ${sourceSans.className} antialiased`}
-      >
+      <body className={`${plusJakartaSans.className} antialiased`}>
         <ToastProvider>
-          {siteDetails.googleAnalyticsId && <GoogleAnalytics gaId={siteDetails.googleAnalyticsId} />}
-          <Header />
-          <main>
-            {children}
-          </main>
-          <Footer />
+          <AuthProvider>
+            {siteDetails.googleAnalyticsId && <GoogleAnalytics gaId={siteDetails.googleAnalyticsId} />}
+            <Header />
+            <main>
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>

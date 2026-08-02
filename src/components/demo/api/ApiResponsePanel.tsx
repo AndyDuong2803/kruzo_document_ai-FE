@@ -1,122 +1,60 @@
 import clsx from "clsx";
 import { FiAlertCircle, FiCheckCircle, FiClock, FiCopy, FiInfo } from "react-icons/fi";
 
-import ApiCodeTabs from "./ApiCodeTabs";
-import type { PlaygroundTab, PlaygroundTabOption, SendState } from "./types";
+import type { SendState } from "./types";
 
 type ApiResponsePanelProps = {
-  activeContent: string;
-  activeTab: PlaygroundTab;
-  copiedLabel: string;
-  debugDetails: string;
-  endpoint: string;
+  content: string;
+  copied: boolean;
   message: string;
   sendState: SendState;
-  tabs: PlaygroundTabOption[];
   onCopy: () => void;
-  onTabChange: (tab: PlaygroundTab) => void;
 };
 
-const ApiResponsePanel: React.FC<ApiResponsePanelProps> = ({
-  activeContent,
-  activeTab,
-  copiedLabel,
-  debugDetails,
-  endpoint,
-  message,
-  sendState,
-  tabs,
-  onCopy,
-  onTabChange,
-}) => {
-  const statusMeta = {
-    idle: {
-      label: "Sample response",
-      helper: "Static example shown before you send a request.",
-      icon: FiInfo,
-      className: "border-[var(--accent-border)] bg-[var(--accent-soft)] text-secondary",
-    },
-    loading: {
-      label: "Loading",
-      helper: "Waiting for the OCR API response.",
-      icon: FiClock,
-      className: "border-amber-600 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-500 dark:text-amber-950",
-    },
-    success: {
-      label: "Real response",
-      helper: "Response returned by the OCR API.",
-      icon: FiCheckCircle,
-      className: "border-emerald-700 bg-emerald-100 text-emerald-950 dark:border-emerald-300 dark:bg-emerald-500 dark:text-emerald-950",
-    },
-    error: {
-      label: "Failed",
-      helper: "The request failed. The friendly message and technical payload are kept here for debugging.",
-      icon: FiAlertCircle,
-      className: "border-red-300 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200",
-    },
+const ApiResponsePanel: React.FC<ApiResponsePanelProps> = ({ content, copied, message, sendState, onCopy }) => {
+  const status = {
+    idle: { label: "Sample response", helper: "Updates as you change the file or template.", icon: FiInfo, className: "status-ready" },
+    loading: { label: "Loading", helper: "Waiting for the OCR API.", icon: FiClock, className: "status-processing" },
+    success: { label: "Real response", helper: "Returned by the OCR API.", icon: FiCheckCircle, className: "status-completed" },
+    error: { label: "Real error", helper: "Returned after the test request failed.", icon: FiAlertCircle, className: "status-failed" },
   }[sendState];
-  const StatusIcon = statusMeta.icon;
+  const StatusIcon = status.icon;
 
   return (
-    <div className="brand-card min-w-0 overflow-hidden rounded-2xl">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-5 py-4">
+    <section className="brand-card flex min-w-0 flex-col overflow-hidden rounded-xl" aria-labelledby="api-response-title">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-5 py-4">
         <div>
-          <p className="text-sm font-semibold text-secondary">Response & code</p>
-          <p className="text-sm text-muted">{endpoint}</p>
+          <p className="text-sm font-semibold text-secondary">Response</p>
+          <h2 id="api-response-title" className="mt-1 text-xl font-semibold">Raw JSON</h2>
+          <p className="mt-1 text-xs text-muted">{status.helper}</p>
         </div>
-        <span
-          className={clsx(
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold",
-            statusMeta.className
-          )}
-        >
-          <StatusIcon aria-hidden="true" />
-          {statusMeta.label}
-        </span>
-      </div>
-
-      <ApiCodeTabs activeTab={activeTab} tabs={tabs} onChange={onTabChange} />
-
-      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
-        <div>
-          <p className="text-sm font-semibold text-secondary">{tabs.find((tab) => tab.id === activeTab)?.label}</p>
-          <p className="text-xs text-muted">{activeTab === "response" ? statusMeta.helper : "Copy-ready request example."}</p>
-        </div>
-        <button type="button" className="brand-button brand-button-secondary button-pop gap-2 px-4 py-2 text-sm" onClick={onCopy}>
-          {copiedLabel === activeTab ? <FiCheckCircle aria-hidden="true" /> : <FiCopy aria-hidden="true" />}
-          {copiedLabel === activeTab ? "Copied" : "Copy"}
-        </button>
-      </div>
-
-      {activeTab === "response" && (
-        <div
-          className={clsx(
-            "border-b px-5 py-3 text-sm",
-            sendState === "error"
-              ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200"
-              : "border-border bg-card-muted text-muted"
-          )}
-          aria-live="polite"
-        >
+        <span className={clsx(status.className, "gap-1.5")}><StatusIcon aria-hidden="true" /> {status.label}</span>
+      </header>
+      {message && (
+        <div className={clsx(
+          "border-b border-border px-5 py-3 text-sm",
+          sendState === "error" ? "bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-100" : "bg-card-muted text-muted"
+        )} aria-live="polite">
           {message}
         </div>
       )}
-
-      <pre className="max-h-[680px] min-h-[520px] overflow-auto p-5 text-sm leading-relaxed text-foreground">
-        <code>{activeContent}</code>
-      </pre>
-
-      {activeTab === "response" && sendState === "error" && debugDetails && (
-        <details className="border-t border-border bg-card-muted px-5 py-4">
-          <summary className="cursor-pointer text-sm font-semibold text-foreground">
-            Technical details
-          </summary>
-          <pre className="mt-3 max-h-64 overflow-auto rounded-xl border border-border bg-card p-4 text-sm text-foreground">
-            <code>{debugDetails}</code>
-          </pre>
-        </details>
-      )}
-    </div>
+      <div className="flex items-center justify-end border-b border-border px-4 py-2">
+        <button type="button" className="brand-button brand-button-secondary gap-2 px-3 py-1.5 text-xs" onClick={onCopy}>
+          {copied ? <FiCheckCircle aria-hidden="true" /> : <FiCopy aria-hidden="true" />}
+          {copied ? "Copied" : "Copy response"}
+        </button>
+      </div>
+      <div className="p-4">
+        <textarea
+          aria-label="Raw JSON response"
+          readOnly
+          spellCheck={false}
+          value={content}
+          rows={12}
+          className="h-[300px] min-h-[220px] w-full resize-y overflow-auto rounded-md border border-border bg-card-muted px-4 py-3 font-mono text-sm leading-relaxed outline-none"
+        />
+      </div>
+    </section>
   );
 };
 

@@ -13,7 +13,7 @@ type LoginPageProps = {
 const LoginPage: React.FC<LoginPageProps> = ({ searchParams }) => {
   const rawNext = Array.isArray(searchParams?.next) ? searchParams?.next[0] : searchParams?.next;
 
-  return <GoogleLoginPanel returnTo={sanitizeReturnTo(rawNext)} />;
+  return <GoogleLoginPanel returnTo={sanitizeReturnTo(rawNext || "/upload")} />;
 };
 
 export default LoginPage;

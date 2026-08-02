@@ -1,82 +1,62 @@
 "use client";
 
 import Container from "@/components/Container";
-import ApiHistory from "./api/ApiHistory";
-import ApiHistoryModal from "./api/ApiHistoryModal";
+import ApiExamples from "./api/ApiExamples";
 import ApiRequestForm from "./api/ApiRequestForm";
 import ApiResponsePanel from "./api/ApiResponsePanel";
-import { modeOptions, tabs } from "./api/constants";
 import { useApiPlayground } from "./api/useApiPlayground";
 
 const ApiPlayground: React.FC = () => {
   const playground = useApiPlayground();
 
   return (
-    <section className="relative overflow-hidden px-5 pb-16 pt-28 md:pt-32">
-      <div className="brand-hero-grid absolute inset-0 -z-10 opacity-70"></div>
+    <section className="px-5 pb-14 pt-24 md:pt-28">
       <Container>
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Developer tool</p>
-            <h1 className="mt-2 text-3xl font-bold text-foreground md:text-5xl">API Integration</h1>
-            <p className="mt-3 text-muted">
-              Test template-based OCR extraction with a real multipart request.
-            </p>
+            <p className="text-sm font-semibold text-secondary">Developer API playground</p>
+            <h1 className="mt-2 text-3xl font-semibold md:text-4xl">Test one extraction request</h1>
+            <p className="mt-3 text-muted">Upload a document, edit the JSON template, and inspect the raw response.</p>
           </div>
 
-          <div className="grid min-w-0 gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid min-w-0 items-start gap-5 lg:grid-cols-2">
             <ApiRequestForm
+              apiKey={playground.apiKey}
               canSend={playground.canSend}
-              debugDetails={playground.debugDetails}
+              endpoint={playground.endpoint}
               file={playground.file}
-              message={playground.message}
-              mode={playground.mode}
-              modeOptions={modeOptions}
               schemaSample={playground.schemaSample}
+              schemaTemplates={playground.schemaTemplates}
+              schemaTemplateId={playground.schemaTemplateId}
               schemaValidation={playground.schemaValidation}
               sendDisabledReason={playground.sendDisabledReason}
               sendState={playground.sendState}
+              onApiKeyChange={playground.setApiKey}
               onFileChange={playground.handleFileChange}
               onFormatSchema={playground.formatSchema}
-              onModeChange={playground.handleModeChange}
               onSchemaSampleChange={playground.setSchemaSample}
+              onSchemaTemplateChange={playground.selectSchemaTemplate}
               onSubmit={playground.sendRequest}
-              onUseSampleSchema={playground.useSampleSchema}
+              onRestoreSample={playground.restoreSchema}
             />
-
             <ApiResponsePanel
-              activeContent={playground.activeContent}
-              activeTab={playground.activeTab}
-              copiedLabel={playground.copiedLabel}
-              debugDetails={playground.debugDetails}
-              endpoint={playground.endpoint}
+              content={playground.responseContent}
+              copied={playground.copiedLabel === "response"}
               message={playground.message}
               sendState={playground.sendState}
-              tabs={tabs}
-              onCopy={playground.copyActiveTab}
-              onTabChange={playground.setActiveTab}
+              onCopy={playground.copyResponse}
             />
           </div>
 
-          <ApiHistory
-            copiedLabel={playground.copiedLabel}
-            currentPage={playground.boundedHistoryPage}
-            items={playground.historyPageItems}
-            totalItems={playground.history.length}
-            totalPages={playground.historyTotalPages}
-            onCopyJson={playground.copyHistoryResponse}
-            onPageChange={playground.setHistoryPage}
-            onViewResponse={playground.setActiveHistoryId}
+          <ApiExamples
+            activeTab={playground.activeExampleTab}
+            content={playground.exampleContent}
+            copied={playground.copiedLabel === `example-${playground.activeExampleTab}`}
+            onChange={playground.setActiveExampleTab}
+            onCopy={playground.copyExample}
           />
         </div>
       </Container>
-
-      <ApiHistoryModal
-        copiedLabel={playground.copiedLabel}
-        item={playground.activeHistoryItem}
-        onClose={() => playground.setActiveHistoryId(null)}
-        onCopyJson={playground.copyHistoryResponse}
-      />
     </section>
   );
 };
