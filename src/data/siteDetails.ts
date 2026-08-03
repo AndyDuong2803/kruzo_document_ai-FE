@@ -1,6 +1,6 @@
 export const siteDetails = {
     siteName: 'Kruzo Document AI',
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://document-ai.kruzo.tech',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://document-ai.kruzoservice.com',
     metadata: {
         title: 'Kruzo Document AI - Documents to Excel',
         description: 'Upload PDFs or images, choose the information you need, and download a clean Excel file.',

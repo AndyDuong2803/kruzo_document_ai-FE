@@ -10,7 +10,13 @@ const Footer: React.FC = () => {
   if (pathname === "/login") {
     return (
       <footer className="border-t border-border bg-card">
-        <div className="mx-auto w-full max-w-7xl px-5 py-4 text-xs text-muted">© {new Date().getFullYear()} Kruzo Service</div>
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 text-xs text-muted">
+          <span>© {new Date().getFullYear()} Kruzo Service</span>
+          <nav className="flex gap-4" aria-label="Legal">
+            <Link href="/privacy" className="footer-link">Privacy Policy</Link>
+            <Link href="/terms" className="footer-link">Terms of Use</Link>
+          </nav>
+        </div>
       </footer>
     );
   }
@@ -39,8 +45,12 @@ const Footer: React.FC = () => {
       </div>
     </div>
     <div className="border-t border-border">
-      <div className="mx-auto w-full max-w-7xl px-5 py-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4">
         <span className="text-xs text-muted">© {new Date().getFullYear()} Kruzo Service</span>
+        <nav className="flex gap-4 text-xs" aria-label="Legal">
+          <Link href="/privacy" className="footer-link">Privacy Policy</Link>
+          <Link href="/terms" className="footer-link">Terms of Use</Link>
+        </nav>
       </div>
     </div>
     </footer>

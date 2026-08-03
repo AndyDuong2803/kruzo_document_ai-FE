@@ -45,6 +45,17 @@ describe("simplified public product contract", () => {
     expect(login).toContain("await setSession(accessToken)");
   });
 
+  it("links legal pages and confirms passwords during registration", () => {
+    const footer = source("src/components/Footer.tsx");
+    const login = source("src/features/auth/components/GoogleLoginPanel.tsx");
+
+    expect(footer).toContain('href="/privacy"');
+    expect(footer).toContain('href="/terms"');
+    expect(login).toContain("Confirm password");
+    expect(login).toContain("Passwords do not match.");
+    expect(login).toContain("password !== confirmPassword");
+  });
+
   it("keeps API examples open on cURL and limits upload-page history", () => {
     expect(source("src/components/demo/api/ApiExamples.tsx")).toContain("<details open");
     expect(source("src/components/demo/api/useApiPlayground.ts")).toContain(

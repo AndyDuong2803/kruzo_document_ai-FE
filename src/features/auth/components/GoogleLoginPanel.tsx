@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import KruzoLogo from "@/components/KruzoLogo";
@@ -19,6 +20,7 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -86,8 +88,12 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    setBusy(true);
     setError("");
+    if (mode === "register" && password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    setBusy(true);
     try {
       const result = mode === "login"
         ? await loginWithPassword(email, password)
@@ -119,13 +125,39 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
               </button>
             </div>
           </div>
+          {mode === "register" && (
+            <div className="grid gap-1.5">
+              <label htmlFor="confirm-password" className="text-sm font-semibold">Confirm password</label>
+              <div className="relative">
+                <input
+                  id="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  minLength={8}
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  className="form-control pr-16"
+                />
+                <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted" onClick={() => setShowPassword((value) => !value)}>
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+          )}
           {error && <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">{error}</p>}
           <button disabled={busy} className="brand-button brand-button-primary w-full px-5 py-3">
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
 
-        <button type="button" className="nav-link mt-4" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}>
+        {mode === "register" && (
+          <p className="mt-4 text-xs leading-5 text-muted">
+            By creating an account, you agree to the <Link href="/terms" className="font-semibold text-primary">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="font-semibold text-primary">Privacy Policy</Link>.
+          </p>
+        )}
+
+        <button type="button" className="nav-link mt-4" onClick={() => { setMode(mode === "login" ? "register" : "login"); setConfirmPassword(""); setError(""); }}>
           {mode === "login" ? "Create account" : "Already have an account? Sign in"}
         </button>
 

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { faqs } from "@/data/faq";
 import { siteDetails } from "@/data/siteDetails";
 
-export const canonicalDomain = "https://document-ai.kruzo.tech";
-export const productionApiDomain = "https://api.smartocr.kruzo.tech";
+export const canonicalDomain = "https://document-ai.kruzoservice.com";
+export const productionApiDomain = "https://api.kruzoservice.com";
 
 export type SeoRoute = {
   path: string;
@@ -73,6 +73,18 @@ export const seoRoutes = {
     keywords: ["Kruzo login", "Google login", "document extraction account"],
     priority: 0.6,
     index: false,
+  },
+  privacy: {
+    path: "/privacy",
+    title: "Privacy Policy - Kruzo Document AI",
+    description: "How Kruzo Document AI collects, uses, shares, and protects account and document-processing information.",
+    priority: 0.2,
+  },
+  terms: {
+    path: "/terms",
+    title: "Terms of Use - Kruzo Document AI",
+    description: "Terms governing accounts, document processing, API access, credits, and use of Kruzo Document AI.",
+    priority: 0.2,
   },
 } satisfies Record<string, SeoRoute>;
 
