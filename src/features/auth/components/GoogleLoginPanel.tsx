@@ -11,16 +11,41 @@ type GoogleLoginPanelProps = {
   returnTo?: string;
 };
 
+type LegalAcceptanceCheckboxProps = {
+  checked: boolean;
+  googleContext?: boolean;
+  onChange: (checked: boolean) => void;
+};
+
+const LegalAcceptanceCheckbox: React.FC<LegalAcceptanceCheckboxProps> = ({ checked, googleContext, onChange }) => (
+  <div className="rounded-md border border-border bg-card-muted p-3">
+    <label className="flex cursor-pointer items-start gap-3 text-sm leading-6">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]"
+      />
+      <span>
+        I agree to the <Link href="/terms" target="_blank" className="font-semibold text-primary">Terms of Use</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-primary">Privacy Policy</Link>.
+      </span>
+    </label>
+    {googleContext && <p className="ml-7 mt-1 text-xs leading-5 text-muted">Required if this Google sign-in creates an account or the current terms have not yet been accepted.</p>}
+  </div>
+);
+
 const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
   const router = useRouter();
   const { setSession } = useAuth();
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleInitializedRef = useRef(false);
   const googleCallbackHandledRef = useRef(false);
+  const legalAcceptedRef = useRef(false);
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [legalAccepted, setLegalAccepted] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +80,7 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
           googleCallbackHandledRef.current = true;
           setBusy(true);
           setError("");
-          loginWithGoogleToken(credential)
+          loginWithGoogleToken(credential, legalAcceptedRef.current)
             .then((result) => completeLogin(result.access_token))
             .catch((cause) => {
               googleCallbackHandledRef.current = false;
@@ -93,11 +118,15 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
       setError("Passwords do not match.");
       return;
     }
+    if (mode === "register" && !legalAccepted) {
+      setError("Accept the Terms of Use and acknowledge the Privacy Policy to create an account.");
+      return;
+    }
     setBusy(true);
     try {
       const result = mode === "login"
         ? await loginWithPassword(email, password)
-        : await registerWithPassword(email, password);
+        : await registerWithPassword(email, password, legalAccepted);
       await completeLogin(result.access_token);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not sign in.");
@@ -145,17 +174,21 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
               </div>
             </div>
           )}
+          {mode === "register" && (
+            <LegalAcceptanceCheckbox
+              checked={legalAccepted}
+              onChange={(checked) => {
+                legalAcceptedRef.current = checked;
+                setLegalAccepted(checked);
+                setError("");
+              }}
+            />
+          )}
           {error && <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">{error}</p>}
           <button disabled={busy} className="brand-button brand-button-primary w-full px-5 py-3">
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
-
-        {mode === "register" && (
-          <p className="mt-4 text-xs leading-5 text-muted">
-            By creating an account, you agree to the <Link href="/terms" className="font-semibold text-primary">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="font-semibold text-primary">Privacy Policy</Link>.
-          </p>
-        )}
 
         <button type="button" className="nav-link mt-4" onClick={() => { setMode(mode === "login" ? "register" : "login"); setConfirmPassword(""); setError(""); }}>
           {mode === "login" ? "Create account" : "Already have an account? Sign in"}
@@ -164,7 +197,18 @@ const GoogleLoginPanel: React.FC<GoogleLoginPanelProps> = ({ returnTo }) => {
         {googleClientId && (
           <>
             <div className="my-5 flex items-center gap-3 text-xs text-muted"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
-            <div ref={googleButtonRef} className={busy ? "pointer-events-none opacity-60" : ""} />
+            {mode === "login" && (
+              <LegalAcceptanceCheckbox
+                checked={legalAccepted}
+                googleContext
+                onChange={(checked) => {
+                  legalAcceptedRef.current = checked;
+                  setLegalAccepted(checked);
+                  setError("");
+                }}
+              />
+            )}
+            <div ref={googleButtonRef} className={`${mode === "login" ? "mt-3 " : ""}${busy ? "pointer-events-none opacity-60" : ""}`} />
           </>
         )}
       </div>

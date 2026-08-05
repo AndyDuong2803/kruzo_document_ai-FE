@@ -54,6 +54,8 @@ describe("simplified public product contract", () => {
     expect(login).toContain("Confirm password");
     expect(login).toContain("Passwords do not match.");
     expect(login).toContain("password !== confirmPassword");
+    expect(login).toContain("LegalAcceptanceCheckbox");
+    expect(login).toContain("legalAcceptedRef.current");
   });
 
   it("keeps API examples open on cURL and limits upload-page history", () => {

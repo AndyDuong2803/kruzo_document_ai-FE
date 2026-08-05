@@ -6,8 +6,7 @@ type RequestSnippetOptions = {
   schemaSampleForExamples: string;
 };
 
-const apiKeyHeader = (apiKey: string) =>
-  apiKey ? `X-API-Key: ${apiKey}` : "";
+const apiKeyHeader = (apiKey: string) => `X-API-Key: ${apiKey}`;
 
 export const buildCurlCommand = ({
   apiKey,
@@ -15,9 +14,8 @@ export const buildCurlCommand = ({
   endpoint,
   filePart,
 }: RequestSnippetOptions) => {
-  const header = apiKeyHeader(apiKey);
   return `curl -X POST "${endpoint}" \\
-  ${header ? `-H "${header}" \\` : ""}
+  -H "${apiKeyHeader(apiKey)}" \\
   -F "file=@${filePart}" \\
   -F 'schema_sample=${compactSchemaSample}'`;
 };
@@ -27,15 +25,13 @@ export const buildFetchExample = ({
   endpoint,
   schemaSampleForExamples,
 }: RequestSnippetOptions) => {
-  const headers = apiKey
-    ? `\n  headers: { "X-API-Key": "${apiKey}" },`
-    : "";
   return `const formData = new FormData();
 formData.append("file", fileInput.files[0]);
 formData.append("schema_sample", ${JSON.stringify(schemaSampleForExamples)});
 
 const response = await fetch("${endpoint}", {
-  method: "POST",${headers}
+  method: "POST",
+  headers: { "X-API-Key": "${apiKey}" },
   body: formData,
 });
 
@@ -47,16 +43,14 @@ export const buildPythonExample = ({
   endpoint,
   schemaSampleForExamples,
 }: RequestSnippetOptions) => {
-  const headers = apiKey
-    ? `\n        headers={"X-API-Key": "${apiKey}"},`
-    : "";
   return `import requests
 
 schema_sample = """${schemaSampleForExamples}"""
 
 with open("document.pdf", "rb") as file:
     response = requests.post(
-        "${endpoint}",${headers}
+        "${endpoint}",
+        headers={"X-API-Key": "${apiKey}"},
         files={"file": file},
         data={"schema_sample": schema_sample},
     )

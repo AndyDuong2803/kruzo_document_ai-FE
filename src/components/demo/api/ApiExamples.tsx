@@ -19,6 +19,7 @@ const ApiExamples: React.FC<ApiExamplesProps> = ({ activeTab, content, copied, o
       <div>
         <p className="text-sm font-semibold text-secondary">Examples</p>
         <h2 id="api-examples-title" className="mt-1 text-lg font-semibold">Use the same request in code</h2>
+        <p className="mt-1 text-xs text-muted">X-API-Key is required. Enter it above to populate the empty header value.</p>
       </div>
       <div className="flex flex-wrap gap-1">
         {codeExampleOptions.map((option) => (

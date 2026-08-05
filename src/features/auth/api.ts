@@ -1,5 +1,6 @@
 import { buildOcrApiUrl } from "@/features/ocr/api/config";
 import type { ApiEnvelope } from "@/features/ocr/api/types";
+import { legalAcceptancePayload } from "./legal";
 
 export type AuthUser = {
   id: string;
@@ -54,18 +55,18 @@ export const loginWithPassword = (email: string, password: string) =>
     body: JSON.stringify({ email, password }),
   });
 
-export const registerWithPassword = async (email: string, password: string) => {
+export const registerWithPassword = async (email: string, password: string, legalAccepted: boolean) => {
   await jsonRequest<AuthUser>("/api/v1/auth/register", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, ...legalAcceptancePayload(legalAccepted) }),
   });
   return loginWithPassword(email, password);
 };
 
-export const loginWithGoogleToken = (idToken: string) =>
+export const loginWithGoogleToken = (idToken: string, legalAccepted: boolean) =>
   jsonRequest<{ access_token: string; token_type: string }>("/api/v1/auth/google", {
     method: "POST",
-    body: JSON.stringify({ id_token: idToken }),
+    body: JSON.stringify({ id_token: idToken, ...legalAcceptancePayload(legalAccepted) }),
   });
 
 export const getCurrentUser = (token: string) =>

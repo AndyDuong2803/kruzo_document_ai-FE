@@ -9,7 +9,7 @@ const sections: LegalSection[] = [
   {
     id: "acceptance",
     title: "Acceptance of these terms",
-    content: <p>These Terms of Use (&quot;Terms&quot;) govern access to Kruzo Document AI, including its website, account features, document-processing tools, and API (together, the &quot;Service&quot;). By creating an account or using the Service, you agree to these Terms and acknowledge our <Link href="/privacy">Privacy Policy</Link>. If you use the Service for an organization, you confirm that you have authority to bind that organization.</p>,
+    content: <><p>These Terms of Use (&quot;Terms&quot;) govern access to Kruzo Document AI, including its website, account features, document-processing tools, and API (together, the &quot;Service&quot;). By creating an account or using the Service, you agree to these Terms and acknowledge our <Link href="/privacy">Privacy Policy</Link>. If you use the Service for an organization, you confirm that you have authority to bind that organization.</p><p>When you create an account or accept updated terms, we may record the acceptance time and the policy versions presented to you. The acceptance box is not selected in advance, and the linked documents remain available for review before you continue.</p></>,
   },
   {
     id: "eligibility",
@@ -89,5 +89,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function TermsOfUsePage() {
-  return <LegalDocument eyebrow="Legal" title="Terms of Use" summary="These terms set the rules for using Kruzo Document AI, including accounts, document processing, API access, credits, and AI-generated results." updatedAt="August 3, 2026" sections={sections} />;
+  return <LegalDocument eyebrow="Legal" title="Terms of Use" summary="These terms set the rules for using Kruzo Document AI, including accounts, document processing, API access, credits, and AI-generated results." updatedAt="August 5, 2026" sections={sections} />;
 }
