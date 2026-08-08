@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1024,initial-scale=1" />
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:1024px;height:768px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#172033;background:#f4f7fb}
+    .stage{width:1024px;height:768px;padding:30px 36px;background:linear-gradient(145deg,#fff,#eef4fb)}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.brand{font-size:13px;font-weight:800;color:#2864dc;letter-spacing:.08em;text-transform:uppercase}h1{font-size:30px;margin:5px 0 0;letter-spacing:-.03em}.file{font-size:12px;color:#66728a;background:#fff;border:1px solid #d8dfeb;border-radius:8px;padding:10px 12px}
+    .summary{display:grid;grid-template-columns:1.05fr 1.35fr 1.35fr .85fr;gap:10px;margin-bottom:14px}.card{background:white;border:1px solid #d8dfeb;border-radius:10px;padding:12px 14px;box-shadow:0 3px 12px rgba(34,56,94,.05)}.card span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#77839a;font-weight:700}.card strong{display:block;margin-top:6px;font-size:16px}.card.total{background:#2864dc;color:white;border-color:#2864dc}.card.total span{color:#dce8ff}
+    .sheet{background:#fff;border:1px solid #ccd6e4;border-radius:12px;overflow:hidden;margin-top:12px;box-shadow:0 7px 24px rgba(38,57,91,.07)}.sheethead{height:42px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid #d8dfeb;background:#f7f9fc}.tab{padding:8px 13px;border-radius:7px;background:#2864dc;color:white;font-size:12px;font-weight:700}.meta{margin-left:auto;color:#77839a;font-size:11px}
+    table{border-collapse:collapse;width:100%;table-layout:fixed}th{background:#eaf1ff;color:#25406e;font-size:10px;text-align:left;padding:10px 9px;border-right:1px solid #d7e0ed;border-bottom:1px solid #cad5e4}td{font-size:11px;padding:11px 9px;border-right:1px solid #e2e7ef;border-bottom:1px solid #e2e7ef;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}tr:last-child td{border-bottom:0}.documents th:nth-child(4),.documents td:nth-child(4),.documents th:nth-child(5),.documents td:nth-child(5){width:17%}.documents th:nth-child(1),.documents td:nth-child(1){width:12%}.items th:nth-child(2),.items td:nth-child(2){width:27%}.items th:nth-child(1),.items td:nth-child(1){width:7%}
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:#66728a;font-size:11px}.ok{color:#16764b;font-weight:700}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#23a369;margin-right:6px}
+  </style>
+</head>
+<body><main class="stage">
+  <header><div><div class="brand">Kruzo Document AI</div><h1>Structured Excel output</h1></div><div class="file">invoice-extraction-output.xlsx</div></header>
+  <section class="summary">
+    <div class="card"><span>Invoice</span><strong>KDA-2026-0812</strong></div>
+    <div class="card"><span>Seller</span><strong>Kruzo Ridge Operations LLC</strong></div>
+    <div class="card"><span>Buyer</span><strong>Pine &amp; Harbor Studio Inc.</strong></div>
+    <div class="card total"><span>Total</span><strong>$1,026.00</strong></div>
+  </section>
+  <section class="sheet"><div class="sheethead"><div class="tab">Documents</div><div class="meta">Sheet 1 · Fixed invoice fields</div></div>
+    <table class="documents"><thead><tr><th>Invoice number</th><th>Issue date</th><th>Due date</th><th>Seller name</th><th>Buyer name</th><th>Subtotal</th><th>Discount</th><th>Total amount</th></tr></thead>
+    <tbody><tr><td>KDA-2026-0812</td><td>2026/08/05</td><td>2026/08/19</td><td>Kruzo Ridge Operations LLC</td><td>Pine &amp; Harbor Studio Inc.</td><td>$1,000.00</td><td>-$50.00</td><td>$1,026.00</td></tr></tbody></table>
+  </section>
+  <section class="sheet"><div class="sheethead"><div class="tab">Line items</div><div class="meta">Sheet 2 · 3 extracted rows</div></div>
+    <table class="items"><thead><tr><th>Line</th><th>Description</th><th>Quantity</th><th>Unit</th><th>Unit price</th><th>Tax</th><th>Amount</th></tr></thead>
+    <tbody><tr><td>1</td><td>Document scanning setup</td><td>2</td><td>service</td><td>$180.00</td><td>8%</td><td>$360.00</td></tr><tr><td>2</td><td>Invoice data validation</td><td>6</td><td>hour</td><td>$45.00</td><td>8%</td><td>$270.00</td></tr><tr><td>3</td><td>Monthly automation support</td><td>4</td><td>hour</td><td>$92.50</td><td>8%</td><td>$370.00</td></tr></tbody></table>
+  </section>
+  <footer><span class="ok"><i class="dot"></i>Values verified against source invoice</span><span>2 sheets · 14 document fields · 3 line items</span></footer>
+</main></body></html>

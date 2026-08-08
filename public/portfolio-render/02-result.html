@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1024,initial-scale=1" />
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:1024px;height:768px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#172033;background:#eef2f8}
+    .stage{width:1024px;height:768px;padding:25px 40px;background:linear-gradient(145deg,#fff,#edf2f8)}
+    header{height:70px;display:flex;align-items:flex-start;justify-content:space-between}h1{margin:0;font-size:30px;letter-spacing:-.03em}.sub{margin-top:7px;color:#657087;font-size:13px}.status{padding:9px 13px;border-radius:999px;background:#e4f7ee;color:#14734a;font-size:12px;font-weight:700}
+    .top{display:grid;grid-template-columns:600px 330px;gap:14px;height:351px}.card{background:#fff;border:1px solid #d5ddea;border-radius:12px;box-shadow:0 5px 18px rgba(38,57,91,.06)}
+    .fields{padding:17px 18px}.card-title{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#2864dc;font-weight:800;margin-bottom:12px}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{border:1px solid #dde3ed;background:#fafbfe;border-radius:8px;padding:9px 11px;min-height:48px}.field span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#7a8599;font-weight:700}.field strong{display:block;margin-top:5px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wide{grid-column:span 2}.totals{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.money{padding:9px 10px;border-radius:8px;background:#f0f4fb;border:1px solid #dbe3ef}.money span{display:block;font-size:9px;color:#748198;text-transform:uppercase;font-weight:700}.money strong{display:block;margin-top:4px;font-size:14px}.money.total{background:#2864dc;border-color:#2864dc;color:#fff}.money.total span{color:#dce8ff}
+    .proof{overflow:hidden;position:relative}.proof .modal{position:absolute;width:650px;left:-155px;top:-38px}.proof .caption{position:absolute;left:13px;bottom:12px;padding:7px 10px;border-radius:7px;background:rgba(23,32,51,.9);color:#fff;font-size:10px;font-weight:700}.export{position:absolute;right:12px;top:12px;width:226px;height:60px;overflow:hidden;border-radius:8px;box-shadow:0 4px 14px rgba(40,100,220,.22)}.export img{position:absolute;width:1024px;left:-744px;top:-265px}
+    .items{height:264px;margin-top:14px;overflow:hidden;position:relative}.items .label{position:absolute;z-index:2;left:14px;top:12px;padding:6px 9px;border-radius:6px;background:#172033;color:white;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.items img{position:absolute;width:940px;left:0;top:-430px}
+    footer{height:30px;display:flex;align-items:end;justify-content:space-between;color:#677288;font-size:11px}.verified{color:#14734a;font-weight:700}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#25a56a;margin-right:6px}
+  </style>
+</head>
+<body><main class="stage">
+  <header><div><h1>Invoice extraction result</h1><div class="sub">Real web application · Fixed invoice workflow · sample_invoice_portfolio.pdf</div></div><div class="status">✓ 14 fields · 3 line items</div></header>
+  <div class="top">
+    <section class="card fields"><div class="card-title">Extracted invoice fields</div><div class="field-grid">
+      <div class="field"><span>Invoice number</span><strong>KDA-2026-0812</strong></div><div class="field"><span>Issue / due date</span><strong>2026/08/05 · 2026/08/19</strong></div>
+      <div class="field"><span>Seller</span><strong>Kruzo Ridge Operations LLC</strong></div><div class="field"><span>Seller tax ID</span><strong>US-EXAMPLE-1048</strong></div>
+      <div class="field"><span>Buyer</span><strong>Pine &amp; Harbor Studio Inc.</strong></div><div class="field"><span>Buyer tax ID</span><strong>US-EXAMPLE-2042</strong></div>
+      <div class="field"><span>Payment terms</span><strong>Net 14</strong></div><div class="field"><span>Purchase order</span><strong>PO-DEMO-7821</strong></div>
+    </div><div class="totals"><div class="money"><span>Subtotal</span><strong>$1,000.00</strong></div><div class="money"><span>Discount</span><strong>-$50.00</strong></div><div class="money"><span>Tax</span><strong>$76.00</strong></div><div class="money total"><span>Total</span><strong>$1,026.00</strong></div></div></section>
+    <section class="card proof"><img class="modal" src="assets/result-top.png"/><div class="export"><img src="assets/run-summary.png"/></div><div class="caption">Captured from the real result screen</div></section>
+  </div>
+  <section class="card items"><span class="label">Real line items table</span><img src="assets/result-line-items-table.png"/></section>
+  <footer><span class="verified"><i class="dot"></i>All displayed values match the fictional source invoice</span><span>Excel export available</span></footer>
+</main></body></html>

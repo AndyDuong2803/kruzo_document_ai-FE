@@ -8,5 +8,5 @@ export const siteDetails = {
     language: 'en-us',
     locale: 'en-US',
     siteLogo: `${process.env.BASE_PATH || ''}/kruzo-mark.svg`,
-    googleAnalyticsId: '', // e.g. G-XXXXXXX,
+    googleAnalyticsId: 'AW-18356927321',
 }
